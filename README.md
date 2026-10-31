@@ -13,7 +13,7 @@
 
 <div align="center">
 
-## 项目仓库 [https://github.com/Chika-Ire/ocsjs-1](https://github.com/Chika-Ire/ocsjs-1)
+## 项目仓库 [https://github.com/Chika-Ire/ooc](https://github.com/Chika-Ire/ooc)
 
 当前版本：**0.2.0**　｜　基于 [OCS](https://github.com/ocsjs/ocsjs) 二次开发，遵循 MIT 协议
 
