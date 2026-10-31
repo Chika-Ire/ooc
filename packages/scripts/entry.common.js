@@ -19,7 +19,7 @@ if (
 	].some((api) => typeof Reflect.get(globalThis, api) === 'undefined')
 ) {
 	const open = confirm(
-		`OCS网课脚本不支持当前的脚本管理器（${GM_info.scriptHandler}）。` +
+		`OOC 网课助手不支持当前的脚本管理器（${GM_info.scriptHandler}）。` +
 		'请前往 https://docs.ocsjs.com/docs/script 下载指定的脚本管理器，例如 “Scriptcat 脚本猫” 或者 “Tampermonkey 油猴”'
 	);
 
@@ -29,7 +29,7 @@ if (
 	return;
 }
 
-const { start, definedProjects, CommonProject, RenderScript, logoSvg } = OCS;
+const { start, definedProjects, CommonProject, RenderScript } = OCS;
 
 const infos = GM_info;
 
@@ -45,11 +45,8 @@ const infos = GM_info;
 			renderScript: RenderScript,
 			styles: [STYLE],
 			defaultPanelName: CommonProject.scripts.guide.namespace,
-			title: `${logoSvg} OCS 全域名通用版 <span style="font-size: 12px; color: #969696;">v${infos.script.version}</span>`
+			title: `OOC 全域名通用版 <span style="font-size: 12px; color: #969696;">v${infos.script.version}</span>`
 		},
-		updatePage:
-			GM_info.scriptHandler === 'Tampermonkey'
-				? 'https://greasyfork.org/zh-CN/scripts/481438'
-				: 'https://scriptcat.org/zh-CN/script-show-page/1398'
+		updatePage: 'https://github.com/Chika-Ire/ocsjs-1'
 	});
 })();

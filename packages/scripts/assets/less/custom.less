@@ -885,57 +885,6 @@ modal-element .modal-cancel-button:hover {
 	}
 }
 
-// 状态标签组：状态标签 + 延迟标签，间隔排列不拥挤
-.aw-card-status-group {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	flex: none;
-}
-
-// 连接状态徽标（HTTP 状态码 + 延迟）
-.aw-card-status {
-	flex: none;
-	font-size: 11px;
-	line-height: 18px;
-	padding: 0 8px;
-	border-radius: 999px;
-	background-color: #eef2f7;
-	color: #5a6b85;
-	white-space: nowrap;
-
-	&.probing {
-		color: #9aa4b2;
-	}
-
-	&.success {
-		background-color: #e8f7ee;
-		color: #2e7d4f;
-	}
-
-	&.error,
-	&.invalid {
-		background-color: #fdeeee;
-		color: #c0392b;
-	}
-
-	&.timeout {
-		background-color: #fdf3e5;
-		color: #b26a00;
-	}
-
-	&.disabled {
-		background-color: #eef2f7;
-		color: #8a94a6;
-	}
-
-	// 延迟标签：固定中性灰，与状态标签区分
-	&.latency {
-		background-color: #eef2f7;
-		color: #5a6b85;
-	}
-}
-
 .aw-card-rows {
 	list-style: none;
 	padding: 0;

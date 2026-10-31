@@ -74,20 +74,18 @@ function createOptions(ocs) {
 			gap: '\t'.repeat(4)
 		},
 		metadata: {
-			name: 'OCS 网课助手',
+			name: 'OOC 网课助手',
 			version: version,
 			description: [
-				'OCS(online-course-script) 网课助手，官网 https://docs.ocsjs.com ，专注于帮助大学生从网课中释放出来',
-				'让自己的时间把握在自己的手中，拥有人性化的操作页面，流畅的步骤提示，支持 ',
+				'OOC (Open Online Course) 网课助手，基于 OCS 二次开发，支持 ',
 				projectList,
-				'等网课的学习，作业。具体的功能请查看脚本悬浮窗中的教程页面。'
+				'等网课的学习与作业，内置 AI 搜题。'
 			].join(' '),
-			author: 'enncy',
+			author: 'Chika-Ire (基于 OCS)',
 			license: 'MIT',
-			namespace: 'https://enncy.cn',
-			homepage: 'https://docs.ocsjs.com',
-			source: 'https://github.com/ocsjs/ocsjs',
-			icon: 'https://cdn.ocsjs.com/logo.png',
+			namespace: 'https://github.com/Chika-Ire/ocsjs-1',
+			homepage: 'https://github.com/Chika-Ire/ocsjs-1',
+			source: 'https://github.com/Chika-Ire/ocsjs-1',
 			connect: [
 				'enncy.cn',
 				'icodef.com',
@@ -120,16 +118,15 @@ function createOptions(ocs) {
 			],
 			require: [path.join(__dirname, distPath, 'index.js')],
 			resource: [`STYLE ${CSS_PATH}`],
-			'run-at': 'document-start',
-			antifeature: 'payment'
+			'run-at': 'document-start'
 		},
 		entry: path.join(__dirname, '../packages/scripts/entry.js'),
-		dist: path.join(__dirname, distPath, 'ocs.user.js')
+		dist: path.join(__dirname, distPath, 'ooc.user.js')
 	};
 }
 
 /**
- * 生成开发调试脚本（ocs.dev.user.js）。
+ * 生成开发调试脚本（ooc.dev.user.js）。
  * entry.dev.js 的内容会被原样内联进用户脚本（script.builder.ts），
  * 因此 entry 文件改动后必须重新执行本函数，Tampermonkey 中才能拿到最新入口代码。
  */
@@ -146,7 +143,7 @@ async function createDevUserScript() {
 	devOpts.metadata.require = ['file:///' + path.join(distResolvedPath, 'index.js')];
 	devOpts.metadata.resource = [`STYLE file:///${CSS_PATH}`];
 	devOpts.entry = path.join(__dirname, '../packages/scripts/entry.dev.js');
-	devOpts.dist = path.join(distResolvedPath, 'ocs.dev.user.js');
+	devOpts.dist = path.join(distResolvedPath, 'ooc.dev.user.js');
 	/** 导出样式文件 */
 	fs.copyFileSync(CSS_PATH, path.join(distResolvedPath, 'style.css'));
 	console.log('createUserScript: ', devOpts.metadata.name, devOpts.dist);
@@ -157,7 +154,7 @@ async function createUserJs() {
 	/** 模拟浏览器环境 */
 	require('browser-env')();
 
-	/** 先编译样式（easy-us 基础样式 + OCS 自定义样式），保证 style.css 为最新 */
+	/** 先编译样式（easy-us 基础样式 + OOC 自定义样式），保证 style.css 为最新 */
 	await buildStyle();
 
 	// @ts-ignore
@@ -168,8 +165,8 @@ async function createUserJs() {
 	const officialOpts = createOptions(ocs);
 	console.log('CreateUserScript: ', officialOpts.metadata.name, officialOpts.dist);
 	await createUserScript(officialOpts);
-	console.log('createMetaFile: ', path.join(distResolvedPath, 'ocs.meta.js'));
-	await createMetaFile({ dist: officialOpts.dist, metaDist: path.join(distResolvedPath, 'ocs.meta.js') });
+	console.log('createMetaFile: ', path.join(distResolvedPath, 'ooc.meta.js'));
+	await createMetaFile({ dist: officialOpts.dist, metaDist: path.join(distResolvedPath, 'ooc.meta.js') });
 
 	/** 创建调试脚本 */
 	await createDevUserScript();
@@ -181,7 +178,7 @@ async function createUserJs() {
 	connect.push('*');
 	commonOpts.metadata.connect = connect;
 	commonOpts.entry = path.join(__dirname, '../packages/scripts/entry.common.js');
-	commonOpts.dist = path.join(distResolvedPath, 'ocs.common.user.js');
+	commonOpts.dist = path.join(distResolvedPath, 'ooc.common.user.js');
 
 	console.log('createUserScript: ', commonOpts.metadata.name, commonOpts.dist);
 	await createUserScript(commonOpts);

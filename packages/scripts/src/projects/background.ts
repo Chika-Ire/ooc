@@ -1,6 +1,5 @@
 import { RemotePlaywright, request } from '@ocsjs/core';
 import type { SearchInformation, SimplifyWorkResult } from '@ocsjs/core';
-import { markdown } from '../utils/markdown';
 import {
 	$ui,
 	$gm,
@@ -15,8 +14,6 @@ import {
 	MessageElement,
 	$menu
 } from 'easy-us';
-import semver_gt from 'semver/functions/gt';
-import semver_valid from 'semver/functions/valid';
 import { CommonProject } from './common';
 import { CXProject, definedProjects, ICourseProject, IcveMoocProject, YKTProject, ZHSProject, ZJYProject } from '..';
 import { RenderScript } from '../render';
@@ -608,147 +605,6 @@ export const BackgroundProject = Project.create({
 						this.cfg.sync_status = 'unconnect';
 						// 可能是桌面软件未启动，或者未开启配置同步功能，此时直接隐藏脚本面板，防止用户误操作
 						this.hidePanel();
-					}
-				}
-			}
-		}),
-		update: new Script({
-			name: '📥 更新模块',
-			matches: [['所有页面', /.*/]],
-			namespace: 'background.update',
-			configs: {
-				notes: {
-					defaultValue: '脚本自动更新模块，如果有新的版本会自动通知。'
-				},
-				autoNotify: {
-					defaultValue: true,
-					label: '开启更新通知',
-					attrs: { type: 'checkbox', title: '当有最新的版本时自动弹窗通知，默认开启' }
-				},
-				notToday: {
-					defaultValue: -1
-				},
-				ignoreVersions: {
-					defaultValue: [] as string[]
-				}
-			},
-			methods() {
-				return {
-					getLastVersion: async () => {
-						return (await request('https://cdn.ocsjs.com/ocs-version.json?t=' + Date.now(), {
-							method: 'get',
-							type: 'GM_xmlhttpRequest'
-						})) as { 'last-version': string; resource: Record<string, string>; notes: string[] };
-					},
-					/**
-					 * 查看更新日志
-					 */
-					showChangelog: async () => {
-						const changelog = h('div', {
-							className: 'markdown card',
-							innerHTML: '加载中...',
-							style: { maxWidth: '600px' }
-						});
-						$modal.simple({
-							width: 600,
-							content: h('div', [
-								h('div', { className: 'notes card' }, [
-									$ui.notes(['此页面实时更新，遇到问题可以查看最新版本是否修复。'])
-								]),
-								changelog
-							])
-						});
-						const md = await request('https://cdn.ocsjs.com/articles/ocs/changelog.md?t=' + Date.now(), {
-							type: 'GM_xmlhttpRequest',
-							responseType: 'text',
-							method: 'get'
-						});
-						changelog.innerHTML = markdown(md);
-					}
-				};
-			},
-			async onrender({ panel }) {
-				const version = await this.methods.getLastVersion();
-				const infos = $gm.getInfos();
-
-				if (!infos) {
-					return;
-				}
-
-				const changeLog = h('button', { className: 'base-style-button-secondary' }, '📄查看更新日志');
-				changeLog.onclick = () => this.methods.showChangelog();
-				const updatePage = this.startConfig?.updatePage || '';
-				panel.body.replaceChildren(
-					h('div', { className: 'card' }, [
-						h('hr'),
-						h('div', ['最新版本：' + version['last-version'] + ' - ', changeLog]),
-						h('hr'),
-						h('div', '当前版本：' + infos.script.version),
-						h('div', '脚本管理器：' + infos.scriptHandler),
-						h('div', ['脚本更新链接：', h('a', { target: '_blank', href: updatePage }, [updatePage || '无'])])
-					])
-				);
-				console.log('versions', {
-					notToday: this.cfg.notToday,
-					ignoreVersions: this.cfg.ignoreVersions,
-					version: version
-				});
-			},
-			oncomplete() {
-				if (this.cfg.autoNotify && $.isInTopWindow()) {
-					if (this.cfg.notToday === -1 || this.cfg.notToday !== new Date().getDate()) {
-						const infos = $gm.getInfos();
-						if (infos) {
-							// 版本表达式验证
-							if (!!semver_valid(infos.script.version) === false) {
-								$message.error(`当前版本号 (${infos.script.version}) 不符合semver版本书写规范，请重新修改版本。`);
-								return;
-							}
-
-							// 避免阻挡用户操作，这里等页面运行一段时间后再进行更新提示
-							setTimeout(async () => {
-								const version = await this.methods.getLastVersion();
-								const last = version['last-version'];
-
-								if (
-									// 跳过主动忽略的版本
-									this.cfg.ignoreVersions.includes(last) === false &&
-									// 版本比较
-									semver_gt(last, infos.script.version)
-								) {
-									const updatePage = this.startConfig?.updatePage || '';
-									const modal = $modal.confirm({
-										maskCloseable: false,
-										width: 600,
-										content: $ui.notes([`检测到新版本发布 ${last} ：`, [...(version.notes || [])]]),
-										footer: h('div', [
-											h('button', { className: 'base-style-button-secondary', innerText: '跳过此版本' }, (btn) => {
-												btn.onclick = () => {
-													this.cfg.ignoreVersions = [...this.cfg.ignoreVersions, last];
-													modal?.remove();
-												};
-											}),
-											h('button', { className: 'base-style-button-secondary', innerText: '今日不再提示' }, (btn) => {
-												btn.onclick = () => {
-													this.cfg.notToday = new Date().getDate();
-													modal?.remove();
-												};
-											}),
-											h('button', { className: 'base-style-button', innerText: '前往更新' }, (btn) => {
-												btn.onclick = () => {
-													if (updatePage) {
-														window.open(updatePage, '_blank');
-														modal?.remove();
-													} else {
-														$message.error({ content: '无法前往更新页面，更新链接为空' });
-													}
-												};
-											})
-										])
-									});
-								}
-							}, 5 * 1000);
-						}
 					}
 				}
 			}

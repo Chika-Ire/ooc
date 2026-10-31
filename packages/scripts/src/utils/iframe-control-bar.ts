@@ -32,7 +32,7 @@ function buildControlBar(): HTMLElement {
 		cors.emit(IFRAME_CONTROL_EVENT, ['reload']);
 	};
 
-	// OCS 图标：标识该面板属于脚本，悬浮显示简介与功能说明。
+	// OOC 图标：标识该面板属于脚本，悬浮显示简介与功能说明。
 	// 使用 CSS-only 悬浮提示（样式随操控条注入 shadow root）：
 	// $ui.tooltip 依赖顶层 tooltipContainer（挂载在脚本面板窗口内），面板窗口隐藏时提示不可见
 	const icon = h('span', { className: 'ocs-iframe-bar-tip' }, [
@@ -41,8 +41,8 @@ function buildControlBar(): HTMLElement {
 			style: { display: 'inline-flex', alignItems: 'center' }
 		}),
 		h('div', { className: 'tip-content' }, [
-			h('div', { style: { fontWeight: 'bold', marginBottom: '4px' } }, 'OCS 答题操作面板'),
-			h('div', '当前页面由 OCS 网课助手自动答题中，可进行以下操作：'),
+			h('div', { style: { fontWeight: 'bold', marginBottom: '4px' } }, 'OOC 答题操作面板'),
+			h('div', '当前页面由 OOC 网课助手自动答题中，可进行以下操作：'),
 			h('div', '⏸暂停/▶️继续：暂停或恢复自动答题'),
 			h('div', '🔃重新答题：刷新页面，重新开始自动答题')
 		])

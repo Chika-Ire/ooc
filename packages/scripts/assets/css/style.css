@@ -1989,46 +1989,6 @@ modal-element .modal-cancel-button:hover {
   opacity: 0.4;
   cursor: default;
 }
-.aw-card-status-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex: none;
-}
-.aw-card-status {
-  flex: none;
-  font-size: 11px;
-  line-height: 18px;
-  padding: 0 8px;
-  border-radius: 999px;
-  background-color: #eef2f7;
-  color: #5a6b85;
-  white-space: nowrap;
-}
-.aw-card-status.probing {
-  color: #9aa4b2;
-}
-.aw-card-status.success {
-  background-color: #e8f7ee;
-  color: #2e7d4f;
-}
-.aw-card-status.error,
-.aw-card-status.invalid {
-  background-color: #fdeeee;
-  color: #c0392b;
-}
-.aw-card-status.timeout {
-  background-color: #fdf3e5;
-  color: #b26a00;
-}
-.aw-card-status.disabled {
-  background-color: #eef2f7;
-  color: #8a94a6;
-}
-.aw-card-status.latency {
-  background-color: #eef2f7;
-  color: #5a6b85;
-}
 .aw-card-rows {
   list-style: none;
   padding: 0;

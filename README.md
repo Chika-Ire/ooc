@@ -4,21 +4,18 @@
 <img src="https://cdn.ocsjs.com/resources/img/logo.png" width=124 height=124  >
 </div>
 
-# OCS 网课助手
+# OOC 网课助手
 
-> OCS (Online Course Script) 网课刷课脚本，帮助大学生解决网课难题
+> OOC (Open Online Course) 网课助手，基于 OCS 二次开发，帮助大学生解决网课难题
 
-![GitHub Repo stars](https://img.shields.io/github/stars/ocsjs/ocsjs)
-![npm](https://img.shields.io/npm/v/ocsjs?color=red)
-![NPM](https://img.shields.io/npm/l/ocsjs)
-![今日安装](https://img.shields.io/badge/dynamic/json?color=orange&label=今日安装&query=$.data.today_install&url=https://scriptcat.org/api/v2/scripts/367)
-![总共安装](https://img.shields.io/badge/dynamic/json?color=red&label=总共安装&query=$.data.total_install&url=https://scriptcat.org/api/v2/scripts/367)
 
 </div>
 
 <div align="center">
 
-## 官网及教程 [https://docs.ocsjs.com](https://docs.ocsjs.com)
+## 项目仓库 [https://github.com/Chika-Ire/ocsjs-1](https://github.com/Chika-Ire/ocsjs-1)
+
+当前版本：**0.2.0**　｜　基于 [OCS](https://github.com/ocsjs/ocsjs) 二次开发，遵循 MIT 协议
 
 </div>
 
@@ -26,7 +23,7 @@
 
 ## AI 搜题
 
-本仓库在 OCS 原有「题库配置」的基础上，接入任意 **OpenAI 兼容**的大模型接口来完成自动搜题/答题。
+本项目基于 OCS 的「题库配置」机制，接入任意 **OpenAI 兼容**的大模型接口来完成自动搜题/答题。
 
 - 纯前端运行，**不需要自建后端服务器**：请求由油猴脚本的 `GM_xmlhttpRequest` 直接发往模型厂商，不受浏览器跨域限制。
 - API Key 只保存在你本机的脚本存储中，不会上传到任何第三方服务器。
@@ -40,9 +37,9 @@
 
 1. 浏览器安装 [Tampermonkey](https://www.tampermonkey.net/) 或 Violentmonkey。
 2. 选择任意一种方式安装脚本：
-   - **一键安装**：在浏览器中打开 <https://raw.githubusercontent.com/Chika-Ire/ocsjs-1/5.0/dist/ocs.user.js>，Tampermonkey 会弹出安装页面。
-   - **本地导入**：打开 Tampermonkey 管理面板 → **实用工具 → 从文件导入**，选择本仓库的 `dist/ocs.user.js`；也可以直接把文件拖进浏览器窗口。
-3. 打开学习通、智慧树等课程页面，等待 OCS 悬浮窗出现。
+   - **一键安装**：在浏览器中打开 <https://raw.githubusercontent.com/Chika-Ire/ocsjs-1/5.0/dist/ooc.user.js>，Tampermonkey 会弹出安装页面。
+   - **本地导入**：打开 Tampermonkey 管理面板 → **实用工具 → 从文件导入**，选择本仓库的 `dist/ooc.user.js`；也可以直接把文件拖进浏览器窗口。
+3. 打开学习通、智慧树等课程页面，等待 OOC 悬浮窗出现。
 
 **方式 B：自行构建**
 
@@ -58,7 +55,7 @@ pnpm exec gulp -f ./scripts/tsc.js
 pnpm build
 ```
 
-产物为 `dist/ocs.user.js`。Windows 下如提示找不到 `vite`，需先把
+产物为 `dist/ooc.user.js`。Windows 下如提示找不到 `vite`，需先把
 `packages/core/node_modules/.bin`、`packages/scripts/node_modules/.bin` 和
 `node_modules/.bin` 加入 `PATH` 再执行构建。
 
@@ -72,7 +69,7 @@ pnpm build
 
 ### 三、导入 AI 题库配置（图形界面）
 
-1. 打开课程页面，点击 OCS 悬浮窗。
+1. 打开课程页面，点击 OOC 悬浮窗。
 2. 进入 **通用 → 全局设置 → 题库配置 → 自定义**。
 3. 弹窗顶部切换到 **「AI 配置」** 标签页。
 4. 选择供应商，填写 API Key：
@@ -127,14 +124,14 @@ pnpm build
 | `data.messages` | 由 handler 读取 `env.title` / `env.options` / `env.type` 拼装对话 |
 | `handler` | 解析 `choices[0].message.content`，返回 `[答案, 答案]` |
 
-`handler` 是 OCS 约定的函数源码字符串，会以你的登录身份执行。不要使用来源不明的配置。
+`handler` 是 OOC 约定的函数源码字符串，会以你的登录身份执行。不要使用来源不明的配置。
 
 ### 五、省 token 的设计
 
 - **只让模型输出字母**：单选回 `B`，多选回 `ABD`，判断题回 `对`/`错`，避免回显整段选项。
 - **JSON 模式**：DeepSeek / OpenAI 使用 `response_format: json_object`，输出稳定为 `{"answer":"B"}`；自定义中转站为避免兼容问题默认不发送该参数，仍通过提示词要求 JSON。
 - **动态输出上限**：选择题 40 token，填空/简答 512 token。
-- **题目缓存**：OCS 设置中的题目缓存会按题干命中，重复题不再请求模型。
+- **题目缓存**：OOC 设置中的题目缓存会按题干命中，重复题不再请求模型。
 
 实测一道选择题约消耗 110~120 个输入 token、5 个输出 token。万题量级的成本通常在几元人民币，具体以厂商计费为准。
 
@@ -152,7 +149,7 @@ pnpm build
 
 如果不用图形界面，也可以在“手动配置”里参照第四节的 JSON，修改 `url`、`headers` 和 `data.model`。Anthropic 的请求格式与 OpenAI 不同（`x-api-key` 头、顶层 `system`、响应在 `content[0].text`），建议直接用 AI 配置标签页生成。
 
-**图片题**：DeepSeek 的 `deepseek-chat` 不支持图片输入。题目含图时需要换成多模态模型（如 Qwen-VL、GLM-4V、gpt-4o-mini 等），并修改 `data.messages` 的 handler，把 `env.images`（base64 数组）拼成 `image_url` 内容块。OCS 已自动完成图片下载与 `[图片N]` 占位符替换。
+**图片题**：DeepSeek 的 `deepseek-chat` 不支持图片输入。题目含图时需要换成多模态模型（如 Qwen-VL、GLM-4V、gpt-4o-mini 等），并修改 `data.messages` 的 handler，把 `env.images`（base64 数组）拼成 `image_url` 内容块。OOC 已自动完成图片下载与 `[图片N]` 占位符替换。
 
 ### 七、常见问题
 
@@ -160,7 +157,7 @@ pnpm build
 | --- | --- |
 | `401 Unauthorized` | Key 错误、过期或复制时带了空格 |
 | `402 Insufficient Balance` | 厂商账户余额不足 |
-| 请求超时 | 网络或代理问题；OCS 默认超时 60 秒 |
+| 请求超时 | 网络或代理问题；OOC 默认超时 60 秒 |
 | 搜到答案但未选中选项 | 可在「搜索题目」面板查看模型原始返回，确认输出的是字母而不是整段解释 |
 | 判断题不生效 | 确认提示词中保留了「判断题禁止答字母」，答案是「对/错」而不是 `A/B` |
 | 修改配置后不生效 | 保存配置后刷新页面再试 |

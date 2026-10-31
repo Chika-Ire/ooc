@@ -1,7 +1,7 @@
 {
-	"name": "ocsjs",
-	"version": "5.2.4",
-	"description": "ocs - online course script 在线网络课程辅助工具",
+	"name": "ooc",
+	"version": "0.2.0",
+	"description": "OOC (Open Online Course) 网课助手，基于 OCS 二次开发，内置 AI 搜题",
 	"types": "./lib/src/core/index.d.ts",
 	"main": "./lib/src/core/index.js",
 	"files": [
@@ -54,12 +54,14 @@
 		"tsx": "^4.22.4",
 		"typescript": "^4.5.5"
 	},
+	"private": true,
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/ocsjs/ocsjs.git"
+		"url": "git+https://github.com/Chika-Ire/ocsjs-1.git"
 	},
 	"keywords": [
-		"ocs",
+		"ooc",
+		"open-online-course",
 		"script",
 		"playwright",
 		"puppeteer",
@@ -68,12 +70,12 @@
 		"ant-design-vue",
 		"typescript"
 	],
-	"author": "enncy",
+	"author": "Chika-Ire",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/ocsjs/ocsjs/issues"
+		"url": "https://github.com/Chika-Ire/ocsjs-1/issues"
 	},
-	"homepage": "https://github.com/ocsjs/ocsjs#readme",
+	"homepage": "https://github.com/Chika-Ire/ocsjs-1#readme",
 	"dependencies": {
 		"@microsoft/tsdoc": "^0.14.2"
 	},

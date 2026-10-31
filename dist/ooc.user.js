@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name       				OCS 网课助手
-// @version    				5.2.4
-// @description				OCS(online-course-script) 网课助手，官网 https://docs.ocsjs.com ，专注于帮助大学生从网课中释放出来 让自己的时间把握在自己的手中，拥有人性化的操作页面，流畅的步骤提示，支持  【超星学习通】 【知到智慧树】 【职教云】 【智慧职教】 【中国大学MOOC】 【雨课堂】 等网课的学习，作业。具体的功能请查看脚本悬浮窗中的教程页面。
-// @author     				enncy
+// @name       				OOC 网课助手
+// @version    				0.2.0
+// @description				OOC (Open Online Course) 网课助手，基于 OCS 二次开发，支持  【超星学习通】 【知到智慧树】 【职教云】 【智慧职教】 【中国大学MOOC】 【雨课堂】 等网课的学习与作业，内置 AI 搜题。
+// @author     				Chika-Ire (基于 OCS)
 // @license    				MIT
 // @match      				*://*.zhihuishu.com/*
 // @match      				*://*.polymas.com/*
@@ -52,10 +52,9 @@
 // @grant      				GM_addValueChangeListener
 // @grant      				GM_removeValueChangeListener
 // @run-at     				document-start
-// @namespace  				https://enncy.cn
-// @homepage   				https://docs.ocsjs.com
-// @source     				https://github.com/ocsjs/ocsjs
-// @icon       				https://cdn.ocsjs.com/logo.png
+// @namespace  				https://github.com/Chika-Ire/ocsjs-1
+// @homepage   				https://github.com/Chika-Ire/ocsjs-1
+// @source     				https://github.com/Chika-Ire/ocsjs-1
 // @connect    				enncy.cn
 // @connect    				icodef.com
 // @connect    				ocsjs.com
@@ -66,15 +65,8 @@
 // @connect    				api.deepseek.com
 // @connect    				api.openai.com
 // @connect    				api.anthropic.com
-// @antifeature				payment
 // ==/UserScript==
 
-var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField = (obj, key, value) => {
-  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-  return value;
-};
 (function(global2, factory) {
   typeof exports === "object" && typeof module !== "undefined" ? factory(exports) : typeof define === "function" && define.amd ? define(["exports"], factory) : (global2 = typeof globalThis !== "undefined" ? globalThis : global2 || self, factory(global2.OCS = {}));
 })(this, function(exports2) {
@@ -138,18 +130,18 @@ var __publicField = (obj, key, value) => {
   var _getRawTag = getRawTag$1;
   var objectProto = Object.prototype;
   var nativeObjectToString = objectProto.toString;
-  function objectToString$2(value) {
+  function objectToString$1(value) {
     return nativeObjectToString.call(value);
   }
-  var _objectToString = objectToString$2;
-  var Symbol$1 = _Symbol, getRawTag = _getRawTag, objectToString$1 = _objectToString;
+  var _objectToString = objectToString$1;
+  var Symbol$1 = _Symbol, getRawTag = _getRawTag, objectToString = _objectToString;
   var nullTag = "[object Null]", undefinedTag = "[object Undefined]";
   var symToStringTag = Symbol$1 ? Symbol$1.toStringTag : void 0;
   function baseGetTag$1(value) {
     if (value == null) {
       return value === void 0 ? undefinedTag : nullTag;
     }
-    return symToStringTag && symToStringTag in Object(value) ? getRawTag(value) : objectToString$1(value);
+    return symToStringTag && symToStringTag in Object(value) ? getRawTag(value) : objectToString(value);
   }
   var _baseGetTag = baseGetTag$1;
   function isObjectLike$1(value) {
@@ -381,8 +373,8 @@ var __publicField = (obj, key, value) => {
       this._text = StringUtils.hide(this._text, start2, end, replacer);
       return this;
     }
-    static of(text2) {
-      return new StringUtils(text2);
+    static of(text) {
+      return new StringUtils(text);
     }
     toString() {
       return this._text;
@@ -596,7 +588,7 @@ var __publicField = (obj, key, value) => {
           const fet = env === "node" ? require("node-fetch").default : fetch;
           fet(url, { body: method === "post" ? JSON.stringify(data) : void 0, method, headers }).then((response) => {
             if (opts.anyStatus) {
-              response.text().then((text2) => resolve({ status: response.status, responseText: text2 })).catch(reject);
+              response.text().then((text) => resolve({ status: response.status, responseText: text })).catch(reject);
               return;
             }
             if (responseType === "json") {
@@ -1221,16 +1213,16 @@ var __publicField = (obj, key, value) => {
       });
     };
     var __rest2 = commonjsGlobal && commonjsGlobal.__rest || function(s, e) {
-      var t2 = {};
+      var t = {};
       for (var p in s)
         if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-          t2[p] = s[p];
+          t[p] = s[p];
       if (s != null && typeof Object.getOwnPropertySymbols === "function")
         for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
           if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-            t2[p[i]] = s[p[i]];
+            t[p[i]] = s[p[i]];
         }
-      return t2;
+      return t;
     };
     var __importDefault2 = commonjsGlobal && commonjsGlobal.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
@@ -1852,9 +1844,9 @@ var __publicField = (obj, key, value) => {
         }
       });
     },
-    button(text2, attrs, handler) {
+    button(text, attrs, handler) {
       return (0, dom_1$6.h)("input", Object.assign({ type: "button" }, attrs), function(btn) {
-        btn.value = text2 || "";
+        btn.value = text || "";
         btn.classList.add("base-style-button");
         handler === null || handler === void 0 ? void 0 : handler.apply(this, [btn]);
       });
@@ -2290,9 +2282,9 @@ var __publicField = (obj, key, value) => {
         }
         default: {
           this.provider = (0, dom_1$5.h)("input");
-          if (["checkbox", "radio"].some((t2) => {
+          if (["checkbox", "radio"].some((t) => {
             var _a2;
-            return t2 === ((_a2 = this.attrs) === null || _a2 === void 0 ? void 0 : _a2.type);
+            return t === ((_a2 = this.attrs) === null || _a2 === void 0 ? void 0 : _a2.type);
           })) {
             this.provider.checked = this.store.get(this.key, this.defaultValue);
             const provider2 = this.provider;
@@ -2776,16 +2768,16 @@ var __publicField = (obj, key, value) => {
     });
   };
   var __rest = commonjsGlobal && commonjsGlobal.__rest || function(s, e) {
-    var t2 = {};
+    var t = {};
     for (var p in s)
       if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t2[p] = s[p];
+        t[p] = s[p];
     if (s != null && typeof Object.getOwnPropertySymbols === "function")
       for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
         if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-          t2[p[i]] = s[p[i]];
+          t[p[i]] = s[p[i]];
       }
-    return t2;
+    return t;
   };
   Object.defineProperty(customWindow, "__esModule", { value: true });
   customWindow.modal = customWindow.CustomWindow = void 0;
@@ -3847,8 +3839,8 @@ var __publicField = (obj, key, value) => {
       /\bclass\s+\w+\s*\{/,
       /\bstruct\s+\w+\s*\{/
     ];
-    for (const re2 of strong)
-      if (re2.test(code))
+    for (const re of strong)
+      if (re.test(code))
         score += 2;
     const medium = [
       /=>/,
@@ -3870,8 +3862,8 @@ var __publicField = (obj, key, value) => {
       /\bcout\b/,
       /\bcin\b/
     ];
-    for (const re2 of medium)
-      if (re2.test(code))
+    for (const re of medium)
+      if (re.test(code))
         score += 1;
     if (/\{/.test(code) && /\}/.test(code))
       score += 1;
@@ -4519,7 +4511,7 @@ var __publicField = (obj, key, value) => {
             console.groupEnd();
             console.group(
               "开始搜题: ",
-              (_c2 = ctx.elements.title) == null ? void 0 : _c2.map((t2) => t2 == null ? void 0 : t2.innerText).filter(Boolean).join(", ").slice(0, 20)
+              (_c2 = ctx.elements.title) == null ? void 0 : _c2.map((t) => t == null ? void 0 : t.innerText).filter(Boolean).join(", ").slice(0, 20)
             );
             console.log("ctx", result.ctx);
           }
@@ -4608,7 +4600,7 @@ var __publicField = (obj, key, value) => {
           if (options == null ? void 0 : options.enable_debug) {
             console.log(
               "答题完成: ",
-              (_b2 = (_a2 = result.ctx) == null ? void 0 : _a2.elements.title) == null ? void 0 : _b2.map((t2) => t2 == null ? void 0 : t2.innerText).join(", ").slice(0, 20),
+              (_b2 = (_a2 = result.ctx) == null ? void 0 : _a2.elements.title) == null ? void 0 : _b2.map((t) => t == null ? void 0 : t.innerText).join(", ").slice(0, 20),
               result
             );
           }
@@ -4775,4596 +4767,6 @@ var __publicField = (obj, key, value) => {
       });
     }
   }
-  function getDefaults() {
-    return {
-      async: false,
-      baseUrl: null,
-      breaks: false,
-      extensions: null,
-      gfm: true,
-      headerIds: true,
-      headerPrefix: "",
-      highlight: null,
-      hooks: null,
-      langPrefix: "language-",
-      mangle: true,
-      pedantic: false,
-      renderer: null,
-      sanitize: false,
-      sanitizer: null,
-      silent: false,
-      smartypants: false,
-      tokenizer: null,
-      walkTokens: null,
-      xhtml: false
-    };
-  }
-  let defaults = getDefaults();
-  function changeDefaults(newDefaults) {
-    defaults = newDefaults;
-  }
-  const escapeTest = /[&<>"']/;
-  const escapeReplace = new RegExp(escapeTest.source, "g");
-  const escapeTestNoEncode = /[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/;
-  const escapeReplaceNoEncode = new RegExp(escapeTestNoEncode.source, "g");
-  const escapeReplacements = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  };
-  const getEscapeReplacement = (ch) => escapeReplacements[ch];
-  function escape(html2, encode) {
-    if (encode) {
-      if (escapeTest.test(html2)) {
-        return html2.replace(escapeReplace, getEscapeReplacement);
-      }
-    } else {
-      if (escapeTestNoEncode.test(html2)) {
-        return html2.replace(escapeReplaceNoEncode, getEscapeReplacement);
-      }
-    }
-    return html2;
-  }
-  const unescapeTest = /&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/ig;
-  function unescape(html2) {
-    return html2.replace(unescapeTest, (_, n) => {
-      n = n.toLowerCase();
-      if (n === "colon")
-        return ":";
-      if (n.charAt(0) === "#") {
-        return n.charAt(1) === "x" ? String.fromCharCode(parseInt(n.substring(2), 16)) : String.fromCharCode(+n.substring(1));
-      }
-      return "";
-    });
-  }
-  const caret = /(^|[^\[])\^/g;
-  function edit(regex, opt) {
-    regex = typeof regex === "string" ? regex : regex.source;
-    opt = opt || "";
-    const obj = {
-      replace: (name, val) => {
-        val = val.source || val;
-        val = val.replace(caret, "$1");
-        regex = regex.replace(name, val);
-        return obj;
-      },
-      getRegex: () => {
-        return new RegExp(regex, opt);
-      }
-    };
-    return obj;
-  }
-  const nonWordAndColonTest = /[^\w:]/g;
-  const originIndependentUrl = /^$|^[a-z][a-z0-9+.-]*:|^[?#]/i;
-  function cleanUrl(sanitize, base, href) {
-    if (sanitize) {
-      let prot;
-      try {
-        prot = decodeURIComponent(unescape(href)).replace(nonWordAndColonTest, "").toLowerCase();
-      } catch (e) {
-        return null;
-      }
-      if (prot.indexOf("javascript:") === 0 || prot.indexOf("vbscript:") === 0 || prot.indexOf("data:") === 0) {
-        return null;
-      }
-    }
-    if (base && !originIndependentUrl.test(href)) {
-      href = resolveUrl(base, href);
-    }
-    try {
-      href = encodeURI(href).replace(/%25/g, "%");
-    } catch (e) {
-      return null;
-    }
-    return href;
-  }
-  const baseUrls = {};
-  const justDomain = /^[^:]+:\/*[^/]*$/;
-  const protocol = /^([^:]+:)[\s\S]*$/;
-  const domain = /^([^:]+:\/*[^/]*)[\s\S]*$/;
-  function resolveUrl(base, href) {
-    if (!baseUrls[" " + base]) {
-      if (justDomain.test(base)) {
-        baseUrls[" " + base] = base + "/";
-      } else {
-        baseUrls[" " + base] = rtrim(base, "/", true);
-      }
-    }
-    base = baseUrls[" " + base];
-    const relativeBase = base.indexOf(":") === -1;
-    if (href.substring(0, 2) === "//") {
-      if (relativeBase) {
-        return href;
-      }
-      return base.replace(protocol, "$1") + href;
-    } else if (href.charAt(0) === "/") {
-      if (relativeBase) {
-        return href;
-      }
-      return base.replace(domain, "$1") + href;
-    } else {
-      return base + href;
-    }
-  }
-  const noopTest = { exec: function noopTest2() {
-  } };
-  function splitCells(tableRow, count2) {
-    const row = tableRow.replace(/\|/g, (match, offset, str) => {
-      let escaped = false, curr = offset;
-      while (--curr >= 0 && str[curr] === "\\")
-        escaped = !escaped;
-      if (escaped) {
-        return "|";
-      } else {
-        return " |";
-      }
-    }), cells = row.split(/ \|/);
-    let i = 0;
-    if (!cells[0].trim()) {
-      cells.shift();
-    }
-    if (cells.length > 0 && !cells[cells.length - 1].trim()) {
-      cells.pop();
-    }
-    if (cells.length > count2) {
-      cells.splice(count2);
-    } else {
-      while (cells.length < count2)
-        cells.push("");
-    }
-    for (; i < cells.length; i++) {
-      cells[i] = cells[i].trim().replace(/\\\|/g, "|");
-    }
-    return cells;
-  }
-  function rtrim(str, c, invert) {
-    const l = str.length;
-    if (l === 0) {
-      return "";
-    }
-    let suffLen = 0;
-    while (suffLen < l) {
-      const currChar = str.charAt(l - suffLen - 1);
-      if (currChar === c && !invert) {
-        suffLen++;
-      } else if (currChar !== c && invert) {
-        suffLen++;
-      } else {
-        break;
-      }
-    }
-    return str.slice(0, l - suffLen);
-  }
-  function findClosingBracket(str, b) {
-    if (str.indexOf(b[1]) === -1) {
-      return -1;
-    }
-    const l = str.length;
-    let level = 0, i = 0;
-    for (; i < l; i++) {
-      if (str[i] === "\\") {
-        i++;
-      } else if (str[i] === b[0]) {
-        level++;
-      } else if (str[i] === b[1]) {
-        level--;
-        if (level < 0) {
-          return i;
-        }
-      }
-    }
-    return -1;
-  }
-  function checkSanitizeDeprecation(opt) {
-    if (opt && opt.sanitize && !opt.silent) {
-      console.warn("marked(): sanitize and sanitizer parameters are deprecated since version 0.7.0, should not be used and will be removed in the future. Read more here: https://marked.js.org/#/USING_ADVANCED.md#options");
-    }
-  }
-  function repeatString(pattern, count2) {
-    if (count2 < 1) {
-      return "";
-    }
-    let result = "";
-    while (count2 > 1) {
-      if (count2 & 1) {
-        result += pattern;
-      }
-      count2 >>= 1;
-      pattern += pattern;
-    }
-    return result + pattern;
-  }
-  function outputLink(cap, link, raw, lexer) {
-    const href = link.href;
-    const title = link.title ? escape(link.title) : null;
-    const text2 = cap[1].replace(/\\([\[\]])/g, "$1");
-    if (cap[0].charAt(0) !== "!") {
-      lexer.state.inLink = true;
-      const token = {
-        type: "link",
-        raw,
-        href,
-        title,
-        text: text2,
-        tokens: lexer.inlineTokens(text2)
-      };
-      lexer.state.inLink = false;
-      return token;
-    }
-    return {
-      type: "image",
-      raw,
-      href,
-      title,
-      text: escape(text2)
-    };
-  }
-  function indentCodeCompensation(raw, text2) {
-    const matchIndentToCode = raw.match(/^(\s+)(?:```)/);
-    if (matchIndentToCode === null) {
-      return text2;
-    }
-    const indentToCode = matchIndentToCode[1];
-    return text2.split("\n").map((node) => {
-      const matchIndentInNode = node.match(/^\s+/);
-      if (matchIndentInNode === null) {
-        return node;
-      }
-      const [indentInNode] = matchIndentInNode;
-      if (indentInNode.length >= indentToCode.length) {
-        return node.slice(indentToCode.length);
-      }
-      return node;
-    }).join("\n");
-  }
-  class Tokenizer {
-    constructor(options) {
-      this.options = options || defaults;
-    }
-    space(src2) {
-      const cap = this.rules.block.newline.exec(src2);
-      if (cap && cap[0].length > 0) {
-        return {
-          type: "space",
-          raw: cap[0]
-        };
-      }
-    }
-    code(src2) {
-      const cap = this.rules.block.code.exec(src2);
-      if (cap) {
-        const text2 = cap[0].replace(/^ {1,4}/gm, "");
-        return {
-          type: "code",
-          raw: cap[0],
-          codeBlockStyle: "indented",
-          text: !this.options.pedantic ? rtrim(text2, "\n") : text2
-        };
-      }
-    }
-    fences(src2) {
-      const cap = this.rules.block.fences.exec(src2);
-      if (cap) {
-        const raw = cap[0];
-        const text2 = indentCodeCompensation(raw, cap[3] || "");
-        return {
-          type: "code",
-          raw,
-          lang: cap[2] ? cap[2].trim().replace(this.rules.inline._escapes, "$1") : cap[2],
-          text: text2
-        };
-      }
-    }
-    heading(src2) {
-      const cap = this.rules.block.heading.exec(src2);
-      if (cap) {
-        let text2 = cap[2].trim();
-        if (/#$/.test(text2)) {
-          const trimmed = rtrim(text2, "#");
-          if (this.options.pedantic) {
-            text2 = trimmed.trim();
-          } else if (!trimmed || / $/.test(trimmed)) {
-            text2 = trimmed.trim();
-          }
-        }
-        return {
-          type: "heading",
-          raw: cap[0],
-          depth: cap[1].length,
-          text: text2,
-          tokens: this.lexer.inline(text2)
-        };
-      }
-    }
-    hr(src2) {
-      const cap = this.rules.block.hr.exec(src2);
-      if (cap) {
-        return {
-          type: "hr",
-          raw: cap[0]
-        };
-      }
-    }
-    blockquote(src2) {
-      const cap = this.rules.block.blockquote.exec(src2);
-      if (cap) {
-        const text2 = cap[0].replace(/^ *>[ \t]?/gm, "");
-        const top2 = this.lexer.state.top;
-        this.lexer.state.top = true;
-        const tokens = this.lexer.blockTokens(text2);
-        this.lexer.state.top = top2;
-        return {
-          type: "blockquote",
-          raw: cap[0],
-          tokens,
-          text: text2
-        };
-      }
-    }
-    list(src2) {
-      let cap = this.rules.block.list.exec(src2);
-      if (cap) {
-        let raw, istask, ischecked, indent, i, blankLine, endsWithBlankLine, line, nextLine, rawLine, itemContents, endEarly;
-        let bull = cap[1].trim();
-        const isordered = bull.length > 1;
-        const list = {
-          type: "list",
-          raw: "",
-          ordered: isordered,
-          start: isordered ? +bull.slice(0, -1) : "",
-          loose: false,
-          items: []
-        };
-        bull = isordered ? `\\d{1,9}\\${bull.slice(-1)}` : `\\${bull}`;
-        if (this.options.pedantic) {
-          bull = isordered ? bull : "[*+-]";
-        }
-        const itemRegex = new RegExp(`^( {0,3}${bull})((?:[	 ][^\\n]*)?(?:\\n|$))`);
-        while (src2) {
-          endEarly = false;
-          if (!(cap = itemRegex.exec(src2))) {
-            break;
-          }
-          if (this.rules.block.hr.test(src2)) {
-            break;
-          }
-          raw = cap[0];
-          src2 = src2.substring(raw.length);
-          line = cap[2].split("\n", 1)[0].replace(/^\t+/, (t2) => " ".repeat(3 * t2.length));
-          nextLine = src2.split("\n", 1)[0];
-          if (this.options.pedantic) {
-            indent = 2;
-            itemContents = line.trimLeft();
-          } else {
-            indent = cap[2].search(/[^ ]/);
-            indent = indent > 4 ? 1 : indent;
-            itemContents = line.slice(indent);
-            indent += cap[1].length;
-          }
-          blankLine = false;
-          if (!line && /^ *$/.test(nextLine)) {
-            raw += nextLine + "\n";
-            src2 = src2.substring(nextLine.length + 1);
-            endEarly = true;
-          }
-          if (!endEarly) {
-            const nextBulletRegex = new RegExp(`^ {0,${Math.min(3, indent - 1)}}(?:[*+-]|\\d{1,9}[.)])((?:[ 	][^\\n]*)?(?:\\n|$))`);
-            const hrRegex = new RegExp(`^ {0,${Math.min(3, indent - 1)}}((?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$)`);
-            const fencesBeginRegex = new RegExp(`^ {0,${Math.min(3, indent - 1)}}(?:\`\`\`|~~~)`);
-            const headingBeginRegex = new RegExp(`^ {0,${Math.min(3, indent - 1)}}#`);
-            while (src2) {
-              rawLine = src2.split("\n", 1)[0];
-              nextLine = rawLine;
-              if (this.options.pedantic) {
-                nextLine = nextLine.replace(/^ {1,4}(?=( {4})*[^ ])/g, "  ");
-              }
-              if (fencesBeginRegex.test(nextLine)) {
-                break;
-              }
-              if (headingBeginRegex.test(nextLine)) {
-                break;
-              }
-              if (nextBulletRegex.test(nextLine)) {
-                break;
-              }
-              if (hrRegex.test(src2)) {
-                break;
-              }
-              if (nextLine.search(/[^ ]/) >= indent || !nextLine.trim()) {
-                itemContents += "\n" + nextLine.slice(indent);
-              } else {
-                if (blankLine) {
-                  break;
-                }
-                if (line.search(/[^ ]/) >= 4) {
-                  break;
-                }
-                if (fencesBeginRegex.test(line)) {
-                  break;
-                }
-                if (headingBeginRegex.test(line)) {
-                  break;
-                }
-                if (hrRegex.test(line)) {
-                  break;
-                }
-                itemContents += "\n" + nextLine;
-              }
-              if (!blankLine && !nextLine.trim()) {
-                blankLine = true;
-              }
-              raw += rawLine + "\n";
-              src2 = src2.substring(rawLine.length + 1);
-              line = nextLine.slice(indent);
-            }
-          }
-          if (!list.loose) {
-            if (endsWithBlankLine) {
-              list.loose = true;
-            } else if (/\n *\n *$/.test(raw)) {
-              endsWithBlankLine = true;
-            }
-          }
-          if (this.options.gfm) {
-            istask = /^\[[ xX]\] /.exec(itemContents);
-            if (istask) {
-              ischecked = istask[0] !== "[ ] ";
-              itemContents = itemContents.replace(/^\[[ xX]\] +/, "");
-            }
-          }
-          list.items.push({
-            type: "list_item",
-            raw,
-            task: !!istask,
-            checked: ischecked,
-            loose: false,
-            text: itemContents
-          });
-          list.raw += raw;
-        }
-        list.items[list.items.length - 1].raw = raw.trimRight();
-        list.items[list.items.length - 1].text = itemContents.trimRight();
-        list.raw = list.raw.trimRight();
-        const l = list.items.length;
-        for (i = 0; i < l; i++) {
-          this.lexer.state.top = false;
-          list.items[i].tokens = this.lexer.blockTokens(list.items[i].text, []);
-          if (!list.loose) {
-            const spacers = list.items[i].tokens.filter((t2) => t2.type === "space");
-            const hasMultipleLineBreaks = spacers.length > 0 && spacers.some((t2) => /\n.*\n/.test(t2.raw));
-            list.loose = hasMultipleLineBreaks;
-          }
-        }
-        if (list.loose) {
-          for (i = 0; i < l; i++) {
-            list.items[i].loose = true;
-          }
-        }
-        return list;
-      }
-    }
-    html(src2) {
-      const cap = this.rules.block.html.exec(src2);
-      if (cap) {
-        const token = {
-          type: "html",
-          raw: cap[0],
-          pre: !this.options.sanitizer && (cap[1] === "pre" || cap[1] === "script" || cap[1] === "style"),
-          text: cap[0]
-        };
-        if (this.options.sanitize) {
-          const text2 = this.options.sanitizer ? this.options.sanitizer(cap[0]) : escape(cap[0]);
-          token.type = "paragraph";
-          token.text = text2;
-          token.tokens = this.lexer.inline(text2);
-        }
-        return token;
-      }
-    }
-    def(src2) {
-      const cap = this.rules.block.def.exec(src2);
-      if (cap) {
-        const tag = cap[1].toLowerCase().replace(/\s+/g, " ");
-        const href = cap[2] ? cap[2].replace(/^<(.*)>$/, "$1").replace(this.rules.inline._escapes, "$1") : "";
-        const title = cap[3] ? cap[3].substring(1, cap[3].length - 1).replace(this.rules.inline._escapes, "$1") : cap[3];
-        return {
-          type: "def",
-          tag,
-          raw: cap[0],
-          href,
-          title
-        };
-      }
-    }
-    table(src2) {
-      const cap = this.rules.block.table.exec(src2);
-      if (cap) {
-        const item = {
-          type: "table",
-          header: splitCells(cap[1]).map((c) => {
-            return { text: c };
-          }),
-          align: cap[2].replace(/^ *|\| *$/g, "").split(/ *\| */),
-          rows: cap[3] && cap[3].trim() ? cap[3].replace(/\n[ \t]*$/, "").split("\n") : []
-        };
-        if (item.header.length === item.align.length) {
-          item.raw = cap[0];
-          let l = item.align.length;
-          let i, j, k, row;
-          for (i = 0; i < l; i++) {
-            if (/^ *-+: *$/.test(item.align[i])) {
-              item.align[i] = "right";
-            } else if (/^ *:-+: *$/.test(item.align[i])) {
-              item.align[i] = "center";
-            } else if (/^ *:-+ *$/.test(item.align[i])) {
-              item.align[i] = "left";
-            } else {
-              item.align[i] = null;
-            }
-          }
-          l = item.rows.length;
-          for (i = 0; i < l; i++) {
-            item.rows[i] = splitCells(item.rows[i], item.header.length).map((c) => {
-              return { text: c };
-            });
-          }
-          l = item.header.length;
-          for (j = 0; j < l; j++) {
-            item.header[j].tokens = this.lexer.inline(item.header[j].text);
-          }
-          l = item.rows.length;
-          for (j = 0; j < l; j++) {
-            row = item.rows[j];
-            for (k = 0; k < row.length; k++) {
-              row[k].tokens = this.lexer.inline(row[k].text);
-            }
-          }
-          return item;
-        }
-      }
-    }
-    lheading(src2) {
-      const cap = this.rules.block.lheading.exec(src2);
-      if (cap) {
-        return {
-          type: "heading",
-          raw: cap[0],
-          depth: cap[2].charAt(0) === "=" ? 1 : 2,
-          text: cap[1],
-          tokens: this.lexer.inline(cap[1])
-        };
-      }
-    }
-    paragraph(src2) {
-      const cap = this.rules.block.paragraph.exec(src2);
-      if (cap) {
-        const text2 = cap[1].charAt(cap[1].length - 1) === "\n" ? cap[1].slice(0, -1) : cap[1];
-        return {
-          type: "paragraph",
-          raw: cap[0],
-          text: text2,
-          tokens: this.lexer.inline(text2)
-        };
-      }
-    }
-    text(src2) {
-      const cap = this.rules.block.text.exec(src2);
-      if (cap) {
-        return {
-          type: "text",
-          raw: cap[0],
-          text: cap[0],
-          tokens: this.lexer.inline(cap[0])
-        };
-      }
-    }
-    escape(src2) {
-      const cap = this.rules.inline.escape.exec(src2);
-      if (cap) {
-        return {
-          type: "escape",
-          raw: cap[0],
-          text: escape(cap[1])
-        };
-      }
-    }
-    tag(src2) {
-      const cap = this.rules.inline.tag.exec(src2);
-      if (cap) {
-        if (!this.lexer.state.inLink && /^<a /i.test(cap[0])) {
-          this.lexer.state.inLink = true;
-        } else if (this.lexer.state.inLink && /^<\/a>/i.test(cap[0])) {
-          this.lexer.state.inLink = false;
-        }
-        if (!this.lexer.state.inRawBlock && /^<(pre|code|kbd|script)(\s|>)/i.test(cap[0])) {
-          this.lexer.state.inRawBlock = true;
-        } else if (this.lexer.state.inRawBlock && /^<\/(pre|code|kbd|script)(\s|>)/i.test(cap[0])) {
-          this.lexer.state.inRawBlock = false;
-        }
-        return {
-          type: this.options.sanitize ? "text" : "html",
-          raw: cap[0],
-          inLink: this.lexer.state.inLink,
-          inRawBlock: this.lexer.state.inRawBlock,
-          text: this.options.sanitize ? this.options.sanitizer ? this.options.sanitizer(cap[0]) : escape(cap[0]) : cap[0]
-        };
-      }
-    }
-    link(src2) {
-      const cap = this.rules.inline.link.exec(src2);
-      if (cap) {
-        const trimmedUrl = cap[2].trim();
-        if (!this.options.pedantic && /^</.test(trimmedUrl)) {
-          if (!/>$/.test(trimmedUrl)) {
-            return;
-          }
-          const rtrimSlash = rtrim(trimmedUrl.slice(0, -1), "\\");
-          if ((trimmedUrl.length - rtrimSlash.length) % 2 === 0) {
-            return;
-          }
-        } else {
-          const lastParenIndex = findClosingBracket(cap[2], "()");
-          if (lastParenIndex > -1) {
-            const start2 = cap[0].indexOf("!") === 0 ? 5 : 4;
-            const linkLen = start2 + cap[1].length + lastParenIndex;
-            cap[2] = cap[2].substring(0, lastParenIndex);
-            cap[0] = cap[0].substring(0, linkLen).trim();
-            cap[3] = "";
-          }
-        }
-        let href = cap[2];
-        let title = "";
-        if (this.options.pedantic) {
-          const link = /^([^'"]*[^\s])\s+(['"])(.*)\2/.exec(href);
-          if (link) {
-            href = link[1];
-            title = link[3];
-          }
-        } else {
-          title = cap[3] ? cap[3].slice(1, -1) : "";
-        }
-        href = href.trim();
-        if (/^</.test(href)) {
-          if (this.options.pedantic && !/>$/.test(trimmedUrl)) {
-            href = href.slice(1);
-          } else {
-            href = href.slice(1, -1);
-          }
-        }
-        return outputLink(cap, {
-          href: href ? href.replace(this.rules.inline._escapes, "$1") : href,
-          title: title ? title.replace(this.rules.inline._escapes, "$1") : title
-        }, cap[0], this.lexer);
-      }
-    }
-    reflink(src2, links) {
-      let cap;
-      if ((cap = this.rules.inline.reflink.exec(src2)) || (cap = this.rules.inline.nolink.exec(src2))) {
-        let link = (cap[2] || cap[1]).replace(/\s+/g, " ");
-        link = links[link.toLowerCase()];
-        if (!link) {
-          const text2 = cap[0].charAt(0);
-          return {
-            type: "text",
-            raw: text2,
-            text: text2
-          };
-        }
-        return outputLink(cap, link, cap[0], this.lexer);
-      }
-    }
-    emStrong(src2, maskedSrc, prevChar = "") {
-      let match = this.rules.inline.emStrong.lDelim.exec(src2);
-      if (!match)
-        return;
-      if (match[3] && prevChar.match(/[\p{L}\p{N}]/u))
-        return;
-      const nextChar = match[1] || match[2] || "";
-      if (!nextChar || nextChar && (prevChar === "" || this.rules.inline.punctuation.exec(prevChar))) {
-        const lLength = match[0].length - 1;
-        let rDelim, rLength, delimTotal = lLength, midDelimTotal = 0;
-        const endReg = match[0][0] === "*" ? this.rules.inline.emStrong.rDelimAst : this.rules.inline.emStrong.rDelimUnd;
-        endReg.lastIndex = 0;
-        maskedSrc = maskedSrc.slice(-1 * src2.length + lLength);
-        while ((match = endReg.exec(maskedSrc)) != null) {
-          rDelim = match[1] || match[2] || match[3] || match[4] || match[5] || match[6];
-          if (!rDelim)
-            continue;
-          rLength = rDelim.length;
-          if (match[3] || match[4]) {
-            delimTotal += rLength;
-            continue;
-          } else if (match[5] || match[6]) {
-            if (lLength % 3 && !((lLength + rLength) % 3)) {
-              midDelimTotal += rLength;
-              continue;
-            }
-          }
-          delimTotal -= rLength;
-          if (delimTotal > 0)
-            continue;
-          rLength = Math.min(rLength, rLength + delimTotal + midDelimTotal);
-          const raw = src2.slice(0, lLength + match.index + (match[0].length - rDelim.length) + rLength);
-          if (Math.min(lLength, rLength) % 2) {
-            const text3 = raw.slice(1, -1);
-            return {
-              type: "em",
-              raw,
-              text: text3,
-              tokens: this.lexer.inlineTokens(text3)
-            };
-          }
-          const text2 = raw.slice(2, -2);
-          return {
-            type: "strong",
-            raw,
-            text: text2,
-            tokens: this.lexer.inlineTokens(text2)
-          };
-        }
-      }
-    }
-    codespan(src2) {
-      const cap = this.rules.inline.code.exec(src2);
-      if (cap) {
-        let text2 = cap[2].replace(/\n/g, " ");
-        const hasNonSpaceChars = /[^ ]/.test(text2);
-        const hasSpaceCharsOnBothEnds = /^ /.test(text2) && / $/.test(text2);
-        if (hasNonSpaceChars && hasSpaceCharsOnBothEnds) {
-          text2 = text2.substring(1, text2.length - 1);
-        }
-        text2 = escape(text2, true);
-        return {
-          type: "codespan",
-          raw: cap[0],
-          text: text2
-        };
-      }
-    }
-    br(src2) {
-      const cap = this.rules.inline.br.exec(src2);
-      if (cap) {
-        return {
-          type: "br",
-          raw: cap[0]
-        };
-      }
-    }
-    del(src2) {
-      const cap = this.rules.inline.del.exec(src2);
-      if (cap) {
-        return {
-          type: "del",
-          raw: cap[0],
-          text: cap[2],
-          tokens: this.lexer.inlineTokens(cap[2])
-        };
-      }
-    }
-    autolink(src2, mangle2) {
-      const cap = this.rules.inline.autolink.exec(src2);
-      if (cap) {
-        let text2, href;
-        if (cap[2] === "@") {
-          text2 = escape(this.options.mangle ? mangle2(cap[1]) : cap[1]);
-          href = "mailto:" + text2;
-        } else {
-          text2 = escape(cap[1]);
-          href = text2;
-        }
-        return {
-          type: "link",
-          raw: cap[0],
-          text: text2,
-          href,
-          tokens: [
-            {
-              type: "text",
-              raw: text2,
-              text: text2
-            }
-          ]
-        };
-      }
-    }
-    url(src2, mangle2) {
-      let cap;
-      if (cap = this.rules.inline.url.exec(src2)) {
-        let text2, href;
-        if (cap[2] === "@") {
-          text2 = escape(this.options.mangle ? mangle2(cap[0]) : cap[0]);
-          href = "mailto:" + text2;
-        } else {
-          let prevCapZero;
-          do {
-            prevCapZero = cap[0];
-            cap[0] = this.rules.inline._backpedal.exec(cap[0])[0];
-          } while (prevCapZero !== cap[0]);
-          text2 = escape(cap[0]);
-          if (cap[1] === "www.") {
-            href = "http://" + cap[0];
-          } else {
-            href = cap[0];
-          }
-        }
-        return {
-          type: "link",
-          raw: cap[0],
-          text: text2,
-          href,
-          tokens: [
-            {
-              type: "text",
-              raw: text2,
-              text: text2
-            }
-          ]
-        };
-      }
-    }
-    inlineText(src2, smartypants2) {
-      const cap = this.rules.inline.text.exec(src2);
-      if (cap) {
-        let text2;
-        if (this.lexer.state.inRawBlock) {
-          text2 = this.options.sanitize ? this.options.sanitizer ? this.options.sanitizer(cap[0]) : escape(cap[0]) : cap[0];
-        } else {
-          text2 = escape(this.options.smartypants ? smartypants2(cap[0]) : cap[0]);
-        }
-        return {
-          type: "text",
-          raw: cap[0],
-          text: text2
-        };
-      }
-    }
-  }
-  const block = {
-    newline: /^(?: *(?:\n|$))+/,
-    code: /^( {4}[^\n]+(?:\n(?: *(?:\n|$))*)?)+/,
-    fences: /^ {0,3}(`{3,}(?=[^`\n]*(?:\n|$))|~{3,})([^\n]*)(?:\n|$)(?:|([\s\S]*?)(?:\n|$))(?: {0,3}\1[~`]* *(?=\n|$)|$)/,
-    hr: /^ {0,3}((?:-[\t ]*){3,}|(?:_[ \t]*){3,}|(?:\*[ \t]*){3,})(?:\n+|$)/,
-    heading: /^ {0,3}(#{1,6})(?=\s|$)(.*)(?:\n+|$)/,
-    blockquote: /^( {0,3}> ?(paragraph|[^\n]*)(?:\n|$))+/,
-    list: /^( {0,3}bull)([ \t][^\n]+?)?(?:\n|$)/,
-    html: "^ {0,3}(?:<(script|pre|style|textarea)[\\s>][\\s\\S]*?(?:</\\1>[^\\n]*\\n+|$)|comment[^\\n]*(\\n+|$)|<\\?[\\s\\S]*?(?:\\?>\\n*|$)|<![A-Z][\\s\\S]*?(?:>\\n*|$)|<!\\[CDATA\\[[\\s\\S]*?(?:\\]\\]>\\n*|$)|</?(tag)(?: +|\\n|/?>)[\\s\\S]*?(?:(?:\\n *)+\\n|$)|<(?!script|pre|style|textarea)([a-z][\\w-]*)(?:attribute)*? */?>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n *)+\\n|$)|</(?!script|pre|style|textarea)[a-z][\\w-]*\\s*>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n *)+\\n|$))",
-    def: /^ {0,3}\[(label)\]: *(?:\n *)?([^<\s][^\s]*|<.*?>)(?:(?: +(?:\n *)?| *\n *)(title))? *(?:\n+|$)/,
-    table: noopTest,
-    lheading: /^((?:.|\n(?!\n))+?)\n {0,3}(=+|-+) *(?:\n+|$)/,
-    _paragraph: /^([^\n]+(?:\n(?!hr|heading|lheading|blockquote|fences|list|html|table| +\n)[^\n]+)*)/,
-    text: /^[^\n]+/
-  };
-  block._label = /(?!\s*\])(?:\\.|[^\[\]\\])+/;
-  block._title = /(?:"(?:\\"?|[^"\\])*"|'[^'\n]*(?:\n[^'\n]+)*\n?'|\([^()]*\))/;
-  block.def = edit(block.def).replace("label", block._label).replace("title", block._title).getRegex();
-  block.bullet = /(?:[*+-]|\d{1,9}[.)])/;
-  block.listItemStart = edit(/^( *)(bull) */).replace("bull", block.bullet).getRegex();
-  block.list = edit(block.list).replace(/bull/g, block.bullet).replace("hr", "\\n+(?=\\1?(?:(?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$))").replace("def", "\\n+(?=" + block.def.source + ")").getRegex();
-  block._tag = "address|article|aside|base|basefont|blockquote|body|caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|footer|form|frame|frameset|h[1-6]|head|header|hr|html|iframe|legend|li|link|main|menu|menuitem|meta|nav|noframes|ol|optgroup|option|p|param|section|source|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul";
-  block._comment = /<!--(?!-?>)[\s\S]*?(?:-->|$)/;
-  block.html = edit(block.html, "i").replace("comment", block._comment).replace("tag", block._tag).replace("attribute", / +[a-zA-Z:_][\w.:-]*(?: *= *"[^"\n]*"| *= *'[^'\n]*'| *= *[^\s"'=<>`]+)?/).getRegex();
-  block.paragraph = edit(block._paragraph).replace("hr", block.hr).replace("heading", " {0,3}#{1,6} ").replace("|lheading", "").replace("|table", "").replace("blockquote", " {0,3}>").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)]) ").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", block._tag).getRegex();
-  block.blockquote = edit(block.blockquote).replace("paragraph", block.paragraph).getRegex();
-  block.normal = { ...block };
-  block.gfm = {
-    ...block.normal,
-    table: "^ *([^\\n ].*\\|.*)\\n {0,3}(?:\\| *)?(:?-+:? *(?:\\| *:?-+:? *)*)(?:\\| *)?(?:\\n((?:(?! *\\n|hr|heading|blockquote|code|fences|list|html).*(?:\\n|$))*)\\n*|$)"
-  };
-  block.gfm.table = edit(block.gfm.table).replace("hr", block.hr).replace("heading", " {0,3}#{1,6} ").replace("blockquote", " {0,3}>").replace("code", " {4}[^\\n]").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)]) ").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", block._tag).getRegex();
-  block.gfm.paragraph = edit(block._paragraph).replace("hr", block.hr).replace("heading", " {0,3}#{1,6} ").replace("|lheading", "").replace("table", block.gfm.table).replace("blockquote", " {0,3}>").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)]) ").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", block._tag).getRegex();
-  block.pedantic = {
-    ...block.normal,
-    html: edit(
-      `^ *(?:comment *(?:\\n|\\s*$)|<(tag)[\\s\\S]+?</\\1> *(?:\\n{2,}|\\s*$)|<tag(?:"[^"]*"|'[^']*'|\\s[^'"/>\\s]*)*?/?> *(?:\\n{2,}|\\s*$))`
-    ).replace("comment", block._comment).replace(/tag/g, "(?!(?:a|em|strong|small|s|cite|q|dfn|abbr|data|time|code|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo|span|br|wbr|ins|del|img)\\b)\\w+(?!:|[^\\w\\s@]*@)\\b").getRegex(),
-    def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +(["(][^\n]+[")]))? *(?:\n+|$)/,
-    heading: /^(#{1,6})(.*)(?:\n+|$)/,
-    fences: noopTest,
-    lheading: /^(.+?)\n {0,3}(=+|-+) *(?:\n+|$)/,
-    paragraph: edit(block.normal._paragraph).replace("hr", block.hr).replace("heading", " *#{1,6} *[^\n]").replace("lheading", block.lheading).replace("blockquote", " {0,3}>").replace("|fences", "").replace("|list", "").replace("|html", "").getRegex()
-  };
-  const inline = {
-    escape: /^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/,
-    autolink: /^<(scheme:[^\s\x00-\x1f<>]*|email)>/,
-    url: noopTest,
-    tag: "^comment|^</[a-zA-Z][\\w:-]*\\s*>|^<[a-zA-Z][\\w-]*(?:attribute)*?\\s*/?>|^<\\?[\\s\\S]*?\\?>|^<![a-zA-Z]+\\s[\\s\\S]*?>|^<!\\[CDATA\\[[\\s\\S]*?\\]\\]>",
-    link: /^!?\[(label)\]\(\s*(href)(?:\s+(title))?\s*\)/,
-    reflink: /^!?\[(label)\]\[(ref)\]/,
-    nolink: /^!?\[(ref)\](?:\[\])?/,
-    reflinkSearch: "reflink|nolink(?!\\()",
-    emStrong: {
-      lDelim: /^(?:\*+(?:([punct_])|[^\s*]))|^_+(?:([punct*])|([^\s_]))/,
-      rDelimAst: /^(?:[^_*\\]|\\.)*?\_\_(?:[^_*\\]|\\.)*?\*(?:[^_*\\]|\\.)*?(?=\_\_)|(?:[^*\\]|\\.)+(?=[^*])|[punct_](\*+)(?=[\s]|$)|(?:[^punct*_\s\\]|\\.)(\*+)(?=[punct_\s]|$)|[punct_\s](\*+)(?=[^punct*_\s])|[\s](\*+)(?=[punct_])|[punct_](\*+)(?=[punct_])|(?:[^punct*_\s\\]|\\.)(\*+)(?=[^punct*_\s])/,
-      rDelimUnd: /^(?:[^_*\\]|\\.)*?\*\*(?:[^_*\\]|\\.)*?\_(?:[^_*\\]|\\.)*?(?=\*\*)|(?:[^_\\]|\\.)+(?=[^_])|[punct*](\_+)(?=[\s]|$)|(?:[^punct*_\s\\]|\\.)(\_+)(?=[punct*\s]|$)|[punct*\s](\_+)(?=[^punct*_\s])|[\s](\_+)(?=[punct*])|[punct*](\_+)(?=[punct*])/
-    },
-    code: /^(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/,
-    br: /^( {2,}|\\)\n(?!\s*$)/,
-    del: noopTest,
-    text: /^(`+|[^`])(?:(?= {2,}\n)|[\s\S]*?(?:(?=[\\<!\[`*_]|\b_|$)|[^ ](?= {2,}\n)))/,
-    punctuation: /^([\spunctuation])/
-  };
-  inline._punctuation = "!\"#$%&'()+\\-.,/:;<=>?@\\[\\]`^{|}~";
-  inline.punctuation = edit(inline.punctuation).replace(/punctuation/g, inline._punctuation).getRegex();
-  inline.blockSkip = /\[[^\]]*?\]\([^\)]*?\)|`[^`]*?`|<[^>]*?>/g;
-  inline.escapedEmSt = /(?:^|[^\\])(?:\\\\)*\\[*_]/g;
-  inline._comment = edit(block._comment).replace("(?:-->|$)", "-->").getRegex();
-  inline.emStrong.lDelim = edit(inline.emStrong.lDelim).replace(/punct/g, inline._punctuation).getRegex();
-  inline.emStrong.rDelimAst = edit(inline.emStrong.rDelimAst, "g").replace(/punct/g, inline._punctuation).getRegex();
-  inline.emStrong.rDelimUnd = edit(inline.emStrong.rDelimUnd, "g").replace(/punct/g, inline._punctuation).getRegex();
-  inline._escapes = /\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/g;
-  inline._scheme = /[a-zA-Z][a-zA-Z0-9+.-]{1,31}/;
-  inline._email = /[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(@)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(?![-_])/;
-  inline.autolink = edit(inline.autolink).replace("scheme", inline._scheme).replace("email", inline._email).getRegex();
-  inline._attribute = /\s+[a-zA-Z:_][\w.:-]*(?:\s*=\s*"[^"]*"|\s*=\s*'[^']*'|\s*=\s*[^\s"'=<>`]+)?/;
-  inline.tag = edit(inline.tag).replace("comment", inline._comment).replace("attribute", inline._attribute).getRegex();
-  inline._label = /(?:\[(?:\\.|[^\[\]\\])*\]|\\.|`[^`]*`|[^\[\]\\`])*?/;
-  inline._href = /<(?:\\.|[^\n<>\\])+>|[^\s\x00-\x1f]*/;
-  inline._title = /"(?:\\"?|[^"\\])*"|'(?:\\'?|[^'\\])*'|\((?:\\\)?|[^)\\])*\)/;
-  inline.link = edit(inline.link).replace("label", inline._label).replace("href", inline._href).replace("title", inline._title).getRegex();
-  inline.reflink = edit(inline.reflink).replace("label", inline._label).replace("ref", block._label).getRegex();
-  inline.nolink = edit(inline.nolink).replace("ref", block._label).getRegex();
-  inline.reflinkSearch = edit(inline.reflinkSearch, "g").replace("reflink", inline.reflink).replace("nolink", inline.nolink).getRegex();
-  inline.normal = { ...inline };
-  inline.pedantic = {
-    ...inline.normal,
-    strong: {
-      start: /^__|\*\*/,
-      middle: /^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/,
-      endAst: /\*\*(?!\*)/g,
-      endUnd: /__(?!_)/g
-    },
-    em: {
-      start: /^_|\*/,
-      middle: /^()\*(?=\S)([\s\S]*?\S)\*(?!\*)|^_(?=\S)([\s\S]*?\S)_(?!_)/,
-      endAst: /\*(?!\*)/g,
-      endUnd: /_(?!_)/g
-    },
-    link: edit(/^!?\[(label)\]\((.*?)\)/).replace("label", inline._label).getRegex(),
-    reflink: edit(/^!?\[(label)\]\s*\[([^\]]*)\]/).replace("label", inline._label).getRegex()
-  };
-  inline.gfm = {
-    ...inline.normal,
-    escape: edit(inline.escape).replace("])", "~|])").getRegex(),
-    _extended_email: /[A-Za-z0-9._+-]+(@)[a-zA-Z0-9-_]+(?:\.[a-zA-Z0-9-_]*[a-zA-Z0-9])+(?![-_])/,
-    url: /^((?:ftp|https?):\/\/|www\.)(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*|^email/,
-    _backpedal: /(?:[^?!.,:;*_'"~()&]+|\([^)]*\)|&(?![a-zA-Z0-9]+;$)|[?!.,:;*_'"~)]+(?!$))+/,
-    del: /^(~~?)(?=[^\s~])([\s\S]*?[^\s~])\1(?=[^~]|$)/,
-    text: /^([`~]+|[^`~])(?:(?= {2,}\n)|(?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)|[\s\S]*?(?:(?=[\\<!\[`*~_]|\b_|https?:\/\/|ftp:\/\/|www\.|$)|[^ ](?= {2,}\n)|[^a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-](?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)))/
-  };
-  inline.gfm.url = edit(inline.gfm.url, "i").replace("email", inline.gfm._extended_email).getRegex();
-  inline.breaks = {
-    ...inline.gfm,
-    br: edit(inline.br).replace("{2,}", "*").getRegex(),
-    text: edit(inline.gfm.text).replace("\\b_", "\\b_| {2,}\\n").replace(/\{2,\}/g, "*").getRegex()
-  };
-  function smartypants(text2) {
-    return text2.replace(/---/g, "—").replace(/--/g, "–").replace(/(^|[-\u2014/(\[{"\s])'/g, "$1‘").replace(/'/g, "’").replace(/(^|[-\u2014/(\[{\u2018\s])"/g, "$1“").replace(/"/g, "”").replace(/\.{3}/g, "…");
-  }
-  function mangle(text2) {
-    let out = "", i, ch;
-    const l = text2.length;
-    for (i = 0; i < l; i++) {
-      ch = text2.charCodeAt(i);
-      if (Math.random() > 0.5) {
-        ch = "x" + ch.toString(16);
-      }
-      out += "&#" + ch + ";";
-    }
-    return out;
-  }
-  class Lexer {
-    constructor(options) {
-      this.tokens = [];
-      this.tokens.links = /* @__PURE__ */ Object.create(null);
-      this.options = options || defaults;
-      this.options.tokenizer = this.options.tokenizer || new Tokenizer();
-      this.tokenizer = this.options.tokenizer;
-      this.tokenizer.options = this.options;
-      this.tokenizer.lexer = this;
-      this.inlineQueue = [];
-      this.state = {
-        inLink: false,
-        inRawBlock: false,
-        top: true
-      };
-      const rules = {
-        block: block.normal,
-        inline: inline.normal
-      };
-      if (this.options.pedantic) {
-        rules.block = block.pedantic;
-        rules.inline = inline.pedantic;
-      } else if (this.options.gfm) {
-        rules.block = block.gfm;
-        if (this.options.breaks) {
-          rules.inline = inline.breaks;
-        } else {
-          rules.inline = inline.gfm;
-        }
-      }
-      this.tokenizer.rules = rules;
-    }
-    static get rules() {
-      return {
-        block,
-        inline
-      };
-    }
-    static lex(src2, options) {
-      const lexer = new Lexer(options);
-      return lexer.lex(src2);
-    }
-    static lexInline(src2, options) {
-      const lexer = new Lexer(options);
-      return lexer.inlineTokens(src2);
-    }
-    lex(src2) {
-      src2 = src2.replace(/\r\n|\r/g, "\n");
-      this.blockTokens(src2, this.tokens);
-      let next2;
-      while (next2 = this.inlineQueue.shift()) {
-        this.inlineTokens(next2.src, next2.tokens);
-      }
-      return this.tokens;
-    }
-    blockTokens(src2, tokens = []) {
-      if (this.options.pedantic) {
-        src2 = src2.replace(/\t/g, "    ").replace(/^ +$/gm, "");
-      } else {
-        src2 = src2.replace(/^( *)(\t+)/gm, (_, leading, tabs) => {
-          return leading + "    ".repeat(tabs.length);
-        });
-      }
-      let token, lastToken, cutSrc, lastParagraphClipped;
-      while (src2) {
-        if (this.options.extensions && this.options.extensions.block && this.options.extensions.block.some((extTokenizer) => {
-          if (token = extTokenizer.call({ lexer: this }, src2, tokens)) {
-            src2 = src2.substring(token.raw.length);
-            tokens.push(token);
-            return true;
-          }
-          return false;
-        })) {
-          continue;
-        }
-        if (token = this.tokenizer.space(src2)) {
-          src2 = src2.substring(token.raw.length);
-          if (token.raw.length === 1 && tokens.length > 0) {
-            tokens[tokens.length - 1].raw += "\n";
-          } else {
-            tokens.push(token);
-          }
-          continue;
-        }
-        if (token = this.tokenizer.code(src2)) {
-          src2 = src2.substring(token.raw.length);
-          lastToken = tokens[tokens.length - 1];
-          if (lastToken && (lastToken.type === "paragraph" || lastToken.type === "text")) {
-            lastToken.raw += "\n" + token.raw;
-            lastToken.text += "\n" + token.text;
-            this.inlineQueue[this.inlineQueue.length - 1].src = lastToken.text;
-          } else {
-            tokens.push(token);
-          }
-          continue;
-        }
-        if (token = this.tokenizer.fences(src2)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (token = this.tokenizer.heading(src2)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (token = this.tokenizer.hr(src2)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (token = this.tokenizer.blockquote(src2)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (token = this.tokenizer.list(src2)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (token = this.tokenizer.html(src2)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (token = this.tokenizer.def(src2)) {
-          src2 = src2.substring(token.raw.length);
-          lastToken = tokens[tokens.length - 1];
-          if (lastToken && (lastToken.type === "paragraph" || lastToken.type === "text")) {
-            lastToken.raw += "\n" + token.raw;
-            lastToken.text += "\n" + token.raw;
-            this.inlineQueue[this.inlineQueue.length - 1].src = lastToken.text;
-          } else if (!this.tokens.links[token.tag]) {
-            this.tokens.links[token.tag] = {
-              href: token.href,
-              title: token.title
-            };
-          }
-          continue;
-        }
-        if (token = this.tokenizer.table(src2)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (token = this.tokenizer.lheading(src2)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        cutSrc = src2;
-        if (this.options.extensions && this.options.extensions.startBlock) {
-          let startIndex = Infinity;
-          const tempSrc = src2.slice(1);
-          let tempStart;
-          this.options.extensions.startBlock.forEach(function(getStartIndex) {
-            tempStart = getStartIndex.call({ lexer: this }, tempSrc);
-            if (typeof tempStart === "number" && tempStart >= 0) {
-              startIndex = Math.min(startIndex, tempStart);
-            }
-          });
-          if (startIndex < Infinity && startIndex >= 0) {
-            cutSrc = src2.substring(0, startIndex + 1);
-          }
-        }
-        if (this.state.top && (token = this.tokenizer.paragraph(cutSrc))) {
-          lastToken = tokens[tokens.length - 1];
-          if (lastParagraphClipped && lastToken.type === "paragraph") {
-            lastToken.raw += "\n" + token.raw;
-            lastToken.text += "\n" + token.text;
-            this.inlineQueue.pop();
-            this.inlineQueue[this.inlineQueue.length - 1].src = lastToken.text;
-          } else {
-            tokens.push(token);
-          }
-          lastParagraphClipped = cutSrc.length !== src2.length;
-          src2 = src2.substring(token.raw.length);
-          continue;
-        }
-        if (token = this.tokenizer.text(src2)) {
-          src2 = src2.substring(token.raw.length);
-          lastToken = tokens[tokens.length - 1];
-          if (lastToken && lastToken.type === "text") {
-            lastToken.raw += "\n" + token.raw;
-            lastToken.text += "\n" + token.text;
-            this.inlineQueue.pop();
-            this.inlineQueue[this.inlineQueue.length - 1].src = lastToken.text;
-          } else {
-            tokens.push(token);
-          }
-          continue;
-        }
-        if (src2) {
-          const errMsg = "Infinite loop on byte: " + src2.charCodeAt(0);
-          if (this.options.silent) {
-            console.error(errMsg);
-            break;
-          } else {
-            throw new Error(errMsg);
-          }
-        }
-      }
-      this.state.top = true;
-      return tokens;
-    }
-    inline(src2, tokens = []) {
-      this.inlineQueue.push({ src: src2, tokens });
-      return tokens;
-    }
-    inlineTokens(src2, tokens = []) {
-      let token, lastToken, cutSrc;
-      let maskedSrc = src2;
-      let match;
-      let keepPrevChar, prevChar;
-      if (this.tokens.links) {
-        const links = Object.keys(this.tokens.links);
-        if (links.length > 0) {
-          while ((match = this.tokenizer.rules.inline.reflinkSearch.exec(maskedSrc)) != null) {
-            if (links.includes(match[0].slice(match[0].lastIndexOf("[") + 1, -1))) {
-              maskedSrc = maskedSrc.slice(0, match.index) + "[" + repeatString("a", match[0].length - 2) + "]" + maskedSrc.slice(this.tokenizer.rules.inline.reflinkSearch.lastIndex);
-            }
-          }
-        }
-      }
-      while ((match = this.tokenizer.rules.inline.blockSkip.exec(maskedSrc)) != null) {
-        maskedSrc = maskedSrc.slice(0, match.index) + "[" + repeatString("a", match[0].length - 2) + "]" + maskedSrc.slice(this.tokenizer.rules.inline.blockSkip.lastIndex);
-      }
-      while ((match = this.tokenizer.rules.inline.escapedEmSt.exec(maskedSrc)) != null) {
-        maskedSrc = maskedSrc.slice(0, match.index + match[0].length - 2) + "++" + maskedSrc.slice(this.tokenizer.rules.inline.escapedEmSt.lastIndex);
-        this.tokenizer.rules.inline.escapedEmSt.lastIndex--;
-      }
-      while (src2) {
-        if (!keepPrevChar) {
-          prevChar = "";
-        }
-        keepPrevChar = false;
-        if (this.options.extensions && this.options.extensions.inline && this.options.extensions.inline.some((extTokenizer) => {
-          if (token = extTokenizer.call({ lexer: this }, src2, tokens)) {
-            src2 = src2.substring(token.raw.length);
-            tokens.push(token);
-            return true;
-          }
-          return false;
-        })) {
-          continue;
-        }
-        if (token = this.tokenizer.escape(src2)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (token = this.tokenizer.tag(src2)) {
-          src2 = src2.substring(token.raw.length);
-          lastToken = tokens[tokens.length - 1];
-          if (lastToken && token.type === "text" && lastToken.type === "text") {
-            lastToken.raw += token.raw;
-            lastToken.text += token.text;
-          } else {
-            tokens.push(token);
-          }
-          continue;
-        }
-        if (token = this.tokenizer.link(src2)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (token = this.tokenizer.reflink(src2, this.tokens.links)) {
-          src2 = src2.substring(token.raw.length);
-          lastToken = tokens[tokens.length - 1];
-          if (lastToken && token.type === "text" && lastToken.type === "text") {
-            lastToken.raw += token.raw;
-            lastToken.text += token.text;
-          } else {
-            tokens.push(token);
-          }
-          continue;
-        }
-        if (token = this.tokenizer.emStrong(src2, maskedSrc, prevChar)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (token = this.tokenizer.codespan(src2)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (token = this.tokenizer.br(src2)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (token = this.tokenizer.del(src2)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (token = this.tokenizer.autolink(src2, mangle)) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        if (!this.state.inLink && (token = this.tokenizer.url(src2, mangle))) {
-          src2 = src2.substring(token.raw.length);
-          tokens.push(token);
-          continue;
-        }
-        cutSrc = src2;
-        if (this.options.extensions && this.options.extensions.startInline) {
-          let startIndex = Infinity;
-          const tempSrc = src2.slice(1);
-          let tempStart;
-          this.options.extensions.startInline.forEach(function(getStartIndex) {
-            tempStart = getStartIndex.call({ lexer: this }, tempSrc);
-            if (typeof tempStart === "number" && tempStart >= 0) {
-              startIndex = Math.min(startIndex, tempStart);
-            }
-          });
-          if (startIndex < Infinity && startIndex >= 0) {
-            cutSrc = src2.substring(0, startIndex + 1);
-          }
-        }
-        if (token = this.tokenizer.inlineText(cutSrc, smartypants)) {
-          src2 = src2.substring(token.raw.length);
-          if (token.raw.slice(-1) !== "_") {
-            prevChar = token.raw.slice(-1);
-          }
-          keepPrevChar = true;
-          lastToken = tokens[tokens.length - 1];
-          if (lastToken && lastToken.type === "text") {
-            lastToken.raw += token.raw;
-            lastToken.text += token.text;
-          } else {
-            tokens.push(token);
-          }
-          continue;
-        }
-        if (src2) {
-          const errMsg = "Infinite loop on byte: " + src2.charCodeAt(0);
-          if (this.options.silent) {
-            console.error(errMsg);
-            break;
-          } else {
-            throw new Error(errMsg);
-          }
-        }
-      }
-      return tokens;
-    }
-  }
-  class Renderer {
-    constructor(options) {
-      this.options = options || defaults;
-    }
-    code(code, infostring, escaped) {
-      const lang = (infostring || "").match(/\S*/)[0];
-      if (this.options.highlight) {
-        const out = this.options.highlight(code, lang);
-        if (out != null && out !== code) {
-          escaped = true;
-          code = out;
-        }
-      }
-      code = code.replace(/\n$/, "") + "\n";
-      if (!lang) {
-        return "<pre><code>" + (escaped ? code : escape(code, true)) + "</code></pre>\n";
-      }
-      return '<pre><code class="' + this.options.langPrefix + escape(lang) + '">' + (escaped ? code : escape(code, true)) + "</code></pre>\n";
-    }
-    blockquote(quote) {
-      return `<blockquote>
-${quote}</blockquote>
-`;
-    }
-    html(html2) {
-      return html2;
-    }
-    heading(text2, level, raw, slugger) {
-      if (this.options.headerIds) {
-        const id = this.options.headerPrefix + slugger.slug(raw);
-        return `<h${level} id="${id}">${text2}</h${level}>
-`;
-      }
-      return `<h${level}>${text2}</h${level}>
-`;
-    }
-    hr() {
-      return this.options.xhtml ? "<hr/>\n" : "<hr>\n";
-    }
-    list(body, ordered, start2) {
-      const type = ordered ? "ol" : "ul", startatt = ordered && start2 !== 1 ? ' start="' + start2 + '"' : "";
-      return "<" + type + startatt + ">\n" + body + "</" + type + ">\n";
-    }
-    listitem(text2) {
-      return `<li>${text2}</li>
-`;
-    }
-    checkbox(checked) {
-      return "<input " + (checked ? 'checked="" ' : "") + 'disabled="" type="checkbox"' + (this.options.xhtml ? " /" : "") + "> ";
-    }
-    paragraph(text2) {
-      return `<p>${text2}</p>
-`;
-    }
-    table(header2, body) {
-      if (body)
-        body = `<tbody>${body}</tbody>`;
-      return "<table>\n<thead>\n" + header2 + "</thead>\n" + body + "</table>\n";
-    }
-    tablerow(content) {
-      return `<tr>
-${content}</tr>
-`;
-    }
-    tablecell(content, flags) {
-      const type = flags.header ? "th" : "td";
-      const tag = flags.align ? `<${type} align="${flags.align}">` : `<${type}>`;
-      return tag + content + `</${type}>
-`;
-    }
-    strong(text2) {
-      return `<strong>${text2}</strong>`;
-    }
-    em(text2) {
-      return `<em>${text2}</em>`;
-    }
-    codespan(text2) {
-      return `<code>${text2}</code>`;
-    }
-    br() {
-      return this.options.xhtml ? "<br/>" : "<br>";
-    }
-    del(text2) {
-      return `<del>${text2}</del>`;
-    }
-    link(href, title, text2) {
-      href = cleanUrl(this.options.sanitize, this.options.baseUrl, href);
-      if (href === null) {
-        return text2;
-      }
-      let out = '<a href="' + href + '"';
-      if (title) {
-        out += ' title="' + title + '"';
-      }
-      out += ">" + text2 + "</a>";
-      return out;
-    }
-    image(href, title, text2) {
-      href = cleanUrl(this.options.sanitize, this.options.baseUrl, href);
-      if (href === null) {
-        return text2;
-      }
-      let out = `<img src="${href}" alt="${text2}"`;
-      if (title) {
-        out += ` title="${title}"`;
-      }
-      out += this.options.xhtml ? "/>" : ">";
-      return out;
-    }
-    text(text2) {
-      return text2;
-    }
-  }
-  class TextRenderer {
-    strong(text2) {
-      return text2;
-    }
-    em(text2) {
-      return text2;
-    }
-    codespan(text2) {
-      return text2;
-    }
-    del(text2) {
-      return text2;
-    }
-    html(text2) {
-      return text2;
-    }
-    text(text2) {
-      return text2;
-    }
-    link(href, title, text2) {
-      return "" + text2;
-    }
-    image(href, title, text2) {
-      return "" + text2;
-    }
-    br() {
-      return "";
-    }
-  }
-  class Slugger {
-    constructor() {
-      this.seen = {};
-    }
-    serialize(value) {
-      return value.toLowerCase().trim().replace(/<[!\/a-z].*?>/ig, "").replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,./:;<=>?@[\]^`{|}~]/g, "").replace(/\s/g, "-");
-    }
-    getNextSafeSlug(originalSlug, isDryRun) {
-      let slug = originalSlug;
-      let occurenceAccumulator = 0;
-      if (this.seen.hasOwnProperty(slug)) {
-        occurenceAccumulator = this.seen[originalSlug];
-        do {
-          occurenceAccumulator++;
-          slug = originalSlug + "-" + occurenceAccumulator;
-        } while (this.seen.hasOwnProperty(slug));
-      }
-      if (!isDryRun) {
-        this.seen[originalSlug] = occurenceAccumulator;
-        this.seen[slug] = 0;
-      }
-      return slug;
-    }
-    slug(value, options = {}) {
-      const slug = this.serialize(value);
-      return this.getNextSafeSlug(slug, options.dryrun);
-    }
-  }
-  class Parser {
-    constructor(options) {
-      this.options = options || defaults;
-      this.options.renderer = this.options.renderer || new Renderer();
-      this.renderer = this.options.renderer;
-      this.renderer.options = this.options;
-      this.textRenderer = new TextRenderer();
-      this.slugger = new Slugger();
-    }
-    static parse(tokens, options) {
-      const parser = new Parser(options);
-      return parser.parse(tokens);
-    }
-    static parseInline(tokens, options) {
-      const parser = new Parser(options);
-      return parser.parseInline(tokens);
-    }
-    parse(tokens, top2 = true) {
-      let out = "", i, j, k, l2, l3, row, cell, header2, body, token, ordered, start2, loose, itemBody, item, checked, task, checkbox, ret;
-      const l = tokens.length;
-      for (i = 0; i < l; i++) {
-        token = tokens[i];
-        if (this.options.extensions && this.options.extensions.renderers && this.options.extensions.renderers[token.type]) {
-          ret = this.options.extensions.renderers[token.type].call({ parser: this }, token);
-          if (ret !== false || !["space", "hr", "heading", "code", "table", "blockquote", "list", "html", "paragraph", "text"].includes(token.type)) {
-            out += ret || "";
-            continue;
-          }
-        }
-        switch (token.type) {
-          case "space": {
-            continue;
-          }
-          case "hr": {
-            out += this.renderer.hr();
-            continue;
-          }
-          case "heading": {
-            out += this.renderer.heading(
-              this.parseInline(token.tokens),
-              token.depth,
-              unescape(this.parseInline(token.tokens, this.textRenderer)),
-              this.slugger
-            );
-            continue;
-          }
-          case "code": {
-            out += this.renderer.code(
-              token.text,
-              token.lang,
-              token.escaped
-            );
-            continue;
-          }
-          case "table": {
-            header2 = "";
-            cell = "";
-            l2 = token.header.length;
-            for (j = 0; j < l2; j++) {
-              cell += this.renderer.tablecell(
-                this.parseInline(token.header[j].tokens),
-                { header: true, align: token.align[j] }
-              );
-            }
-            header2 += this.renderer.tablerow(cell);
-            body = "";
-            l2 = token.rows.length;
-            for (j = 0; j < l2; j++) {
-              row = token.rows[j];
-              cell = "";
-              l3 = row.length;
-              for (k = 0; k < l3; k++) {
-                cell += this.renderer.tablecell(
-                  this.parseInline(row[k].tokens),
-                  { header: false, align: token.align[k] }
-                );
-              }
-              body += this.renderer.tablerow(cell);
-            }
-            out += this.renderer.table(header2, body);
-            continue;
-          }
-          case "blockquote": {
-            body = this.parse(token.tokens);
-            out += this.renderer.blockquote(body);
-            continue;
-          }
-          case "list": {
-            ordered = token.ordered;
-            start2 = token.start;
-            loose = token.loose;
-            l2 = token.items.length;
-            body = "";
-            for (j = 0; j < l2; j++) {
-              item = token.items[j];
-              checked = item.checked;
-              task = item.task;
-              itemBody = "";
-              if (item.task) {
-                checkbox = this.renderer.checkbox(checked);
-                if (loose) {
-                  if (item.tokens.length > 0 && item.tokens[0].type === "paragraph") {
-                    item.tokens[0].text = checkbox + " " + item.tokens[0].text;
-                    if (item.tokens[0].tokens && item.tokens[0].tokens.length > 0 && item.tokens[0].tokens[0].type === "text") {
-                      item.tokens[0].tokens[0].text = checkbox + " " + item.tokens[0].tokens[0].text;
-                    }
-                  } else {
-                    item.tokens.unshift({
-                      type: "text",
-                      text: checkbox
-                    });
-                  }
-                } else {
-                  itemBody += checkbox;
-                }
-              }
-              itemBody += this.parse(item.tokens, loose);
-              body += this.renderer.listitem(itemBody, task, checked);
-            }
-            out += this.renderer.list(body, ordered, start2);
-            continue;
-          }
-          case "html": {
-            out += this.renderer.html(token.text);
-            continue;
-          }
-          case "paragraph": {
-            out += this.renderer.paragraph(this.parseInline(token.tokens));
-            continue;
-          }
-          case "text": {
-            body = token.tokens ? this.parseInline(token.tokens) : token.text;
-            while (i + 1 < l && tokens[i + 1].type === "text") {
-              token = tokens[++i];
-              body += "\n" + (token.tokens ? this.parseInline(token.tokens) : token.text);
-            }
-            out += top2 ? this.renderer.paragraph(body) : body;
-            continue;
-          }
-          default: {
-            const errMsg = 'Token with "' + token.type + '" type was not found.';
-            if (this.options.silent) {
-              console.error(errMsg);
-              return;
-            } else {
-              throw new Error(errMsg);
-            }
-          }
-        }
-      }
-      return out;
-    }
-    parseInline(tokens, renderer) {
-      renderer = renderer || this.renderer;
-      let out = "", i, token, ret;
-      const l = tokens.length;
-      for (i = 0; i < l; i++) {
-        token = tokens[i];
-        if (this.options.extensions && this.options.extensions.renderers && this.options.extensions.renderers[token.type]) {
-          ret = this.options.extensions.renderers[token.type].call({ parser: this }, token);
-          if (ret !== false || !["escape", "html", "link", "image", "strong", "em", "codespan", "br", "del", "text"].includes(token.type)) {
-            out += ret || "";
-            continue;
-          }
-        }
-        switch (token.type) {
-          case "escape": {
-            out += renderer.text(token.text);
-            break;
-          }
-          case "html": {
-            out += renderer.html(token.text);
-            break;
-          }
-          case "link": {
-            out += renderer.link(token.href, token.title, this.parseInline(token.tokens, renderer));
-            break;
-          }
-          case "image": {
-            out += renderer.image(token.href, token.title, token.text);
-            break;
-          }
-          case "strong": {
-            out += renderer.strong(this.parseInline(token.tokens, renderer));
-            break;
-          }
-          case "em": {
-            out += renderer.em(this.parseInline(token.tokens, renderer));
-            break;
-          }
-          case "codespan": {
-            out += renderer.codespan(token.text);
-            break;
-          }
-          case "br": {
-            out += renderer.br();
-            break;
-          }
-          case "del": {
-            out += renderer.del(this.parseInline(token.tokens, renderer));
-            break;
-          }
-          case "text": {
-            out += renderer.text(token.text);
-            break;
-          }
-          default: {
-            const errMsg = 'Token with "' + token.type + '" type was not found.';
-            if (this.options.silent) {
-              console.error(errMsg);
-              return;
-            } else {
-              throw new Error(errMsg);
-            }
-          }
-        }
-      }
-      return out;
-    }
-  }
-  class Hooks {
-    constructor(options) {
-      this.options = options || defaults;
-    }
-    preprocess(markdown2) {
-      return markdown2;
-    }
-    postprocess(html2) {
-      return html2;
-    }
-  }
-  __publicField(Hooks, "passThroughHooks", /* @__PURE__ */ new Set([
-    "preprocess",
-    "postprocess"
-  ]));
-  function onError(silent, async, callback) {
-    return (e) => {
-      e.message += "\nPlease report this to https://github.com/markedjs/marked.";
-      if (silent) {
-        const msg2 = "<p>An error occurred:</p><pre>" + escape(e.message + "", true) + "</pre>";
-        if (async) {
-          return Promise.resolve(msg2);
-        }
-        if (callback) {
-          callback(null, msg2);
-          return;
-        }
-        return msg2;
-      }
-      if (async) {
-        return Promise.reject(e);
-      }
-      if (callback) {
-        callback(e);
-        return;
-      }
-      throw e;
-    };
-  }
-  function parseMarkdown(lexer, parser) {
-    return (src2, opt, callback) => {
-      if (typeof opt === "function") {
-        callback = opt;
-        opt = null;
-      }
-      const origOpt = { ...opt };
-      opt = { ...marked.defaults, ...origOpt };
-      const throwError = onError(opt.silent, opt.async, callback);
-      if (typeof src2 === "undefined" || src2 === null) {
-        return throwError(new Error("marked(): input parameter is undefined or null"));
-      }
-      if (typeof src2 !== "string") {
-        return throwError(new Error("marked(): input parameter is of type " + Object.prototype.toString.call(src2) + ", string expected"));
-      }
-      checkSanitizeDeprecation(opt);
-      if (opt.hooks) {
-        opt.hooks.options = opt;
-      }
-      if (callback) {
-        const highlight = opt.highlight;
-        let tokens;
-        try {
-          if (opt.hooks) {
-            src2 = opt.hooks.preprocess(src2);
-          }
-          tokens = lexer(src2, opt);
-        } catch (e) {
-          return throwError(e);
-        }
-        const done = function(err) {
-          let out;
-          if (!err) {
-            try {
-              if (opt.walkTokens) {
-                marked.walkTokens(tokens, opt.walkTokens);
-              }
-              out = parser(tokens, opt);
-              if (opt.hooks) {
-                out = opt.hooks.postprocess(out);
-              }
-            } catch (e) {
-              err = e;
-            }
-          }
-          opt.highlight = highlight;
-          return err ? throwError(err) : callback(null, out);
-        };
-        if (!highlight || highlight.length < 3) {
-          return done();
-        }
-        delete opt.highlight;
-        if (!tokens.length)
-          return done();
-        let pending = 0;
-        marked.walkTokens(tokens, function(token) {
-          if (token.type === "code") {
-            pending++;
-            setTimeout(() => {
-              highlight(token.text, token.lang, function(err, code) {
-                if (err) {
-                  return done(err);
-                }
-                if (code != null && code !== token.text) {
-                  token.text = code;
-                  token.escaped = true;
-                }
-                pending--;
-                if (pending === 0) {
-                  done();
-                }
-              });
-            }, 0);
-          }
-        });
-        if (pending === 0) {
-          done();
-        }
-        return;
-      }
-      if (opt.async) {
-        return Promise.resolve(opt.hooks ? opt.hooks.preprocess(src2) : src2).then((src3) => lexer(src3, opt)).then((tokens) => opt.walkTokens ? Promise.all(marked.walkTokens(tokens, opt.walkTokens)).then(() => tokens) : tokens).then((tokens) => parser(tokens, opt)).then((html2) => opt.hooks ? opt.hooks.postprocess(html2) : html2).catch(throwError);
-      }
-      try {
-        if (opt.hooks) {
-          src2 = opt.hooks.preprocess(src2);
-        }
-        const tokens = lexer(src2, opt);
-        if (opt.walkTokens) {
-          marked.walkTokens(tokens, opt.walkTokens);
-        }
-        let html2 = parser(tokens, opt);
-        if (opt.hooks) {
-          html2 = opt.hooks.postprocess(html2);
-        }
-        return html2;
-      } catch (e) {
-        return throwError(e);
-      }
-    };
-  }
-  function marked(src2, opt, callback) {
-    return parseMarkdown(Lexer.lex, Parser.parse)(src2, opt, callback);
-  }
-  marked.options = marked.setOptions = function(opt) {
-    marked.defaults = { ...marked.defaults, ...opt };
-    changeDefaults(marked.defaults);
-    return marked;
-  };
-  marked.getDefaults = getDefaults;
-  marked.defaults = defaults;
-  marked.use = function(...args) {
-    const extensions = marked.defaults.extensions || { renderers: {}, childTokens: {} };
-    args.forEach((pack) => {
-      const opts = { ...pack };
-      opts.async = marked.defaults.async || opts.async || false;
-      if (pack.extensions) {
-        pack.extensions.forEach((ext) => {
-          if (!ext.name) {
-            throw new Error("extension name required");
-          }
-          if (ext.renderer) {
-            const prevRenderer = extensions.renderers[ext.name];
-            if (prevRenderer) {
-              extensions.renderers[ext.name] = function(...args2) {
-                let ret = ext.renderer.apply(this, args2);
-                if (ret === false) {
-                  ret = prevRenderer.apply(this, args2);
-                }
-                return ret;
-              };
-            } else {
-              extensions.renderers[ext.name] = ext.renderer;
-            }
-          }
-          if (ext.tokenizer) {
-            if (!ext.level || ext.level !== "block" && ext.level !== "inline") {
-              throw new Error("extension level must be 'block' or 'inline'");
-            }
-            if (extensions[ext.level]) {
-              extensions[ext.level].unshift(ext.tokenizer);
-            } else {
-              extensions[ext.level] = [ext.tokenizer];
-            }
-            if (ext.start) {
-              if (ext.level === "block") {
-                if (extensions.startBlock) {
-                  extensions.startBlock.push(ext.start);
-                } else {
-                  extensions.startBlock = [ext.start];
-                }
-              } else if (ext.level === "inline") {
-                if (extensions.startInline) {
-                  extensions.startInline.push(ext.start);
-                } else {
-                  extensions.startInline = [ext.start];
-                }
-              }
-            }
-          }
-          if (ext.childTokens) {
-            extensions.childTokens[ext.name] = ext.childTokens;
-          }
-        });
-        opts.extensions = extensions;
-      }
-      if (pack.renderer) {
-        const renderer = marked.defaults.renderer || new Renderer();
-        for (const prop in pack.renderer) {
-          const prevRenderer = renderer[prop];
-          renderer[prop] = (...args2) => {
-            let ret = pack.renderer[prop].apply(renderer, args2);
-            if (ret === false) {
-              ret = prevRenderer.apply(renderer, args2);
-            }
-            return ret;
-          };
-        }
-        opts.renderer = renderer;
-      }
-      if (pack.tokenizer) {
-        const tokenizer = marked.defaults.tokenizer || new Tokenizer();
-        for (const prop in pack.tokenizer) {
-          const prevTokenizer = tokenizer[prop];
-          tokenizer[prop] = (...args2) => {
-            let ret = pack.tokenizer[prop].apply(tokenizer, args2);
-            if (ret === false) {
-              ret = prevTokenizer.apply(tokenizer, args2);
-            }
-            return ret;
-          };
-        }
-        opts.tokenizer = tokenizer;
-      }
-      if (pack.hooks) {
-        const hooks = marked.defaults.hooks || new Hooks();
-        for (const prop in pack.hooks) {
-          const prevHook = hooks[prop];
-          if (Hooks.passThroughHooks.has(prop)) {
-            hooks[prop] = (arg) => {
-              if (marked.defaults.async) {
-                return Promise.resolve(pack.hooks[prop].call(hooks, arg)).then((ret2) => {
-                  return prevHook.call(hooks, ret2);
-                });
-              }
-              const ret = pack.hooks[prop].call(hooks, arg);
-              return prevHook.call(hooks, ret);
-            };
-          } else {
-            hooks[prop] = (...args2) => {
-              let ret = pack.hooks[prop].apply(hooks, args2);
-              if (ret === false) {
-                ret = prevHook.apply(hooks, args2);
-              }
-              return ret;
-            };
-          }
-        }
-        opts.hooks = hooks;
-      }
-      if (pack.walkTokens) {
-        const walkTokens = marked.defaults.walkTokens;
-        opts.walkTokens = function(token) {
-          let values = [];
-          values.push(pack.walkTokens.call(this, token));
-          if (walkTokens) {
-            values = values.concat(walkTokens.call(this, token));
-          }
-          return values;
-        };
-      }
-      marked.setOptions(opts);
-    });
-  };
-  marked.walkTokens = function(tokens, callback) {
-    let values = [];
-    for (const token of tokens) {
-      values = values.concat(callback.call(marked, token));
-      switch (token.type) {
-        case "table": {
-          for (const cell of token.header) {
-            values = values.concat(marked.walkTokens(cell.tokens, callback));
-          }
-          for (const row of token.rows) {
-            for (const cell of row) {
-              values = values.concat(marked.walkTokens(cell.tokens, callback));
-            }
-          }
-          break;
-        }
-        case "list": {
-          values = values.concat(marked.walkTokens(token.items, callback));
-          break;
-        }
-        default: {
-          if (marked.defaults.extensions && marked.defaults.extensions.childTokens && marked.defaults.extensions.childTokens[token.type]) {
-            marked.defaults.extensions.childTokens[token.type].forEach(function(childTokens) {
-              values = values.concat(marked.walkTokens(token[childTokens], callback));
-            });
-          } else if (token.tokens) {
-            values = values.concat(marked.walkTokens(token.tokens, callback));
-          }
-        }
-      }
-    }
-    return values;
-  };
-  marked.parseInline = parseMarkdown(Lexer.lexInline, Parser.parseInline);
-  marked.Parser = Parser;
-  marked.parser = Parser.parse;
-  marked.Renderer = Renderer;
-  marked.TextRenderer = TextRenderer;
-  marked.Lexer = Lexer;
-  marked.lexer = Lexer.lex;
-  marked.Tokenizer = Tokenizer;
-  marked.Slugger = Slugger;
-  marked.Hooks = Hooks;
-  marked.parse = marked;
-  marked.options;
-  marked.setOptions;
-  marked.use;
-  marked.walkTokens;
-  marked.parseInline;
-  Parser.parse;
-  Lexer.lex;
-  /*! @license DOMPurify 3.4.16 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.4.16/LICENSE */
-  function _arrayLikeToArray(r, a) {
-    (null == a || a > r.length) && (a = r.length);
-    for (var e = 0, n = Array(a); e < a; e++)
-      n[e] = r[e];
-    return n;
-  }
-  function _arrayWithHoles(r) {
-    if (Array.isArray(r))
-      return r;
-  }
-  function _iterableToArrayLimit(r, l) {
-    var t2 = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
-    if (null != t2) {
-      var e, n, i, u, a = [], f = true, o = false;
-      try {
-        if (i = (t2 = t2.call(r)).next, 0 === l) {
-          if (Object(t2) !== t2)
-            return;
-          f = false;
-        } else
-          for (; !(f = (e = i.call(t2)).done) && (a.push(e.value), a.length !== l); f = true)
-            ;
-      } catch (r2) {
-        o = true, n = r2;
-      } finally {
-        try {
-          if (!f && null != t2.return && (u = t2.return(), Object(u) !== u))
-            return;
-        } finally {
-          if (o)
-            throw n;
-        }
-      }
-      return a;
-    }
-  }
-  function _nonIterableRest() {
-    throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-  }
-  /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */
-  function _slicedToArray(r, e) {
-    return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest();
-  }
-  function _unsupportedIterableToArray(r, a) {
-    if (r) {
-      if ("string" == typeof r)
-        return _arrayLikeToArray(r, a);
-      var t2 = {}.toString.call(r).slice(8, -1);
-      return "Object" === t2 && r.constructor && (t2 = r.constructor.name), "Map" === t2 || "Set" === t2 ? Array.from(r) : "Arguments" === t2 || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t2) ? _arrayLikeToArray(r, a) : void 0;
-    }
-  }
-  const entries = Object.entries;
-  const setPrototypeOf = Object.setPrototypeOf;
-  const isFrozen = Object.isFrozen;
-  const getPrototypeOf = Object.getPrototypeOf;
-  const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-  let freeze = Object.freeze;
-  let seal = Object.seal;
-  let create = Object.create;
-  let _ref = typeof Reflect !== "undefined" && Reflect;
-  let apply = _ref.apply;
-  let construct = _ref.construct;
-  if (!freeze)
-    freeze = function freeze2(x) {
-      return x;
-    };
-  if (!seal)
-    seal = function seal2(x) {
-      return x;
-    };
-  if (!apply)
-    apply = function apply2(func, thisArg) {
-      for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++)
-        args[_key - 2] = arguments[_key];
-      return func.apply(thisArg, args);
-    };
-  if (!construct)
-    construct = function construct2(Func) {
-      for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++)
-        args[_key2 - 1] = arguments[_key2];
-      return new Func(...args);
-    };
-  const arrayForEach = unapply(Array.prototype.forEach);
-  const arrayLastIndexOf = unapply(Array.prototype.lastIndexOf);
-  const arrayPop = unapply(Array.prototype.pop);
-  const arrayPush = unapply(Array.prototype.push);
-  const arraySplice = unapply(Array.prototype.splice);
-  const arrayIsArray = Array.isArray;
-  const stringToLowerCase = unapply(String.prototype.toLowerCase);
-  const stringToString = unapply(String.prototype.toString);
-  const stringMatch = unapply(String.prototype.match);
-  const stringReplace = unapply(String.prototype.replace);
-  const stringIndexOf = unapply(String.prototype.indexOf);
-  const stringTrim = unapply(String.prototype.trim);
-  const numberToString = unapply(Number.prototype.toString);
-  const booleanToString = unapply(Boolean.prototype.toString);
-  const bigintToString = typeof BigInt === "undefined" ? null : unapply(BigInt.prototype.toString);
-  const symbolToString = typeof Symbol === "undefined" ? null : unapply(Symbol.prototype.toString);
-  const objectHasOwnProperty = unapply(Object.prototype.hasOwnProperty);
-  const objectToString = unapply(Object.prototype.toString);
-  const regExpTest = unapply(RegExp.prototype.test);
-  const typeErrorCreate = unconstruct(TypeError);
-  function unapply(func) {
-    return function(thisArg) {
-      if (thisArg instanceof RegExp)
-        thisArg.lastIndex = 0;
-      for (var _len3 = arguments.length, args = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++)
-        args[_key3 - 1] = arguments[_key3];
-      return apply(func, thisArg, args);
-    };
-  }
-  function unconstruct(Func) {
-    return function() {
-      for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++)
-        args[_key4] = arguments[_key4];
-      return construct(Func, args);
-    };
-  }
-  function addToSet(set, array) {
-    let transformCaseFunc = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : stringToLowerCase;
-    if (setPrototypeOf)
-      setPrototypeOf(set, null);
-    if (!arrayIsArray(array))
-      return set;
-    let l = array.length;
-    while (l--) {
-      let element = array[l];
-      if (typeof element === "string") {
-        const lcElement = transformCaseFunc(element);
-        if (lcElement !== element) {
-          if (!isFrozen(array))
-            array[l] = lcElement;
-          element = lcElement;
-        }
-      }
-      set[element] = true;
-    }
-    return set;
-  }
-  function cleanArray(array) {
-    for (let index = 0; index < array.length; index++)
-      if (!objectHasOwnProperty(array, index))
-        array[index] = null;
-    return array;
-  }
-  function clone(object) {
-    const newObject = create(null);
-    for (const _ref2 of entries(object)) {
-      var _ref3 = _slicedToArray(_ref2, 2);
-      const property = _ref3[0];
-      const value = _ref3[1];
-      if (objectHasOwnProperty(object, property)) {
-        if (arrayIsArray(value))
-          newObject[property] = cleanArray(value);
-        else if (value && typeof value === "object" && value.constructor === Object)
-          newObject[property] = clone(value);
-        else
-          newObject[property] = value;
-      }
-    }
-    return newObject;
-  }
-  function stringifyValue(value) {
-    switch (typeof value) {
-      case "string":
-        return value;
-      case "number":
-        return numberToString(value);
-      case "boolean":
-        return booleanToString(value);
-      case "bigint":
-        return bigintToString ? bigintToString(value) : "0";
-      case "symbol":
-        return symbolToString ? symbolToString(value) : "Symbol()";
-      case "undefined":
-        return objectToString(value);
-      case "function":
-      case "object": {
-        if (value === null)
-          return objectToString(value);
-        const valueAsRecord = value;
-        const valueToString = lookupGetter(valueAsRecord, "toString");
-        if (typeof valueToString === "function") {
-          const stringified = valueToString(valueAsRecord);
-          return typeof stringified === "string" ? stringified : objectToString(stringified);
-        }
-        return objectToString(value);
-      }
-      default:
-        return objectToString(value);
-    }
-  }
-  function lookupGetter(object, prop) {
-    while (object !== null) {
-      const desc = getOwnPropertyDescriptor(object, prop);
-      if (desc) {
-        if (desc.get)
-          return unapply(desc.get);
-        if (typeof desc.value === "function")
-          return unapply(desc.value);
-      }
-      object = getPrototypeOf(object);
-    }
-    function fallbackValue() {
-      return null;
-    }
-    return fallbackValue;
-  }
-  function isRegex(value) {
-    try {
-      regExpTest(value, "");
-      return true;
-    } catch (_unused) {
-      return false;
-    }
-  }
-  const html$1 = freeze([
-    "a",
-    "abbr",
-    "acronym",
-    "address",
-    "area",
-    "article",
-    "aside",
-    "audio",
-    "b",
-    "bdi",
-    "bdo",
-    "big",
-    "blink",
-    "blockquote",
-    "body",
-    "br",
-    "button",
-    "canvas",
-    "caption",
-    "center",
-    "cite",
-    "code",
-    "col",
-    "colgroup",
-    "content",
-    "data",
-    "datalist",
-    "dd",
-    "decorator",
-    "del",
-    "details",
-    "dfn",
-    "dialog",
-    "dir",
-    "div",
-    "dl",
-    "dt",
-    "element",
-    "em",
-    "fieldset",
-    "figcaption",
-    "figure",
-    "font",
-    "footer",
-    "form",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "head",
-    "header",
-    "hgroup",
-    "hr",
-    "html",
-    "i",
-    "img",
-    "input",
-    "ins",
-    "kbd",
-    "label",
-    "legend",
-    "li",
-    "main",
-    "map",
-    "mark",
-    "marquee",
-    "menu",
-    "menuitem",
-    "meter",
-    "nav",
-    "nobr",
-    "ol",
-    "optgroup",
-    "option",
-    "output",
-    "p",
-    "picture",
-    "pre",
-    "progress",
-    "q",
-    "rp",
-    "rt",
-    "ruby",
-    "s",
-    "samp",
-    "search",
-    "section",
-    "select",
-    "shadow",
-    "slot",
-    "small",
-    "source",
-    "spacer",
-    "span",
-    "strike",
-    "strong",
-    "style",
-    "sub",
-    "summary",
-    "sup",
-    "table",
-    "tbody",
-    "td",
-    "template",
-    "textarea",
-    "tfoot",
-    "th",
-    "thead",
-    "time",
-    "tr",
-    "track",
-    "tt",
-    "u",
-    "ul",
-    "var",
-    "video",
-    "wbr"
-  ]);
-  const svg$1 = freeze([
-    "svg",
-    "a",
-    "altglyph",
-    "altglyphdef",
-    "altglyphitem",
-    "animatecolor",
-    "animatemotion",
-    "animatetransform",
-    "circle",
-    "clippath",
-    "defs",
-    "desc",
-    "ellipse",
-    "enterkeyhint",
-    "exportparts",
-    "filter",
-    "font",
-    "g",
-    "glyph",
-    "glyphref",
-    "hkern",
-    "image",
-    "inputmode",
-    "line",
-    "lineargradient",
-    "marker",
-    "mask",
-    "metadata",
-    "mpath",
-    "part",
-    "path",
-    "pattern",
-    "polygon",
-    "polyline",
-    "radialgradient",
-    "rect",
-    "stop",
-    "style",
-    "switch",
-    "symbol",
-    "text",
-    "textpath",
-    "title",
-    "tref",
-    "tspan",
-    "view",
-    "vkern"
-  ]);
-  const svgFilters = freeze([
-    "feBlend",
-    "feColorMatrix",
-    "feComponentTransfer",
-    "feComposite",
-    "feConvolveMatrix",
-    "feDiffuseLighting",
-    "feDisplacementMap",
-    "feDistantLight",
-    "feDropShadow",
-    "feFlood",
-    "feFuncA",
-    "feFuncB",
-    "feFuncG",
-    "feFuncR",
-    "feGaussianBlur",
-    "feImage",
-    "feMerge",
-    "feMergeNode",
-    "feMorphology",
-    "feOffset",
-    "fePointLight",
-    "feSpecularLighting",
-    "feSpotLight",
-    "feTile",
-    "feTurbulence"
-  ]);
-  const svgDisallowed = freeze([
-    "animate",
-    "color-profile",
-    "cursor",
-    "discard",
-    "font-face",
-    "font-face-format",
-    "font-face-name",
-    "font-face-src",
-    "font-face-uri",
-    "foreignobject",
-    "hatch",
-    "hatchpath",
-    "mesh",
-    "meshgradient",
-    "meshpatch",
-    "meshrow",
-    "missing-glyph",
-    "script",
-    "set",
-    "solidcolor",
-    "unknown",
-    "use"
-  ]);
-  const mathMl$1 = freeze([
-    "math",
-    "menclose",
-    "merror",
-    "mfenced",
-    "mfrac",
-    "mglyph",
-    "mi",
-    "mlabeledtr",
-    "mmultiscripts",
-    "mn",
-    "mo",
-    "mover",
-    "mpadded",
-    "mphantom",
-    "mroot",
-    "mrow",
-    "ms",
-    "mspace",
-    "msqrt",
-    "mstyle",
-    "msub",
-    "msup",
-    "msubsup",
-    "mtable",
-    "mtd",
-    "mtext",
-    "mtr",
-    "munder",
-    "munderover",
-    "mprescripts"
-  ]);
-  const mathMlDisallowed = freeze([
-    "maction",
-    "maligngroup",
-    "malignmark",
-    "mlongdiv",
-    "mscarries",
-    "mscarry",
-    "msgroup",
-    "mstack",
-    "msline",
-    "msrow",
-    "semantics",
-    "annotation",
-    "annotation-xml",
-    "mprescripts",
-    "none"
-  ]);
-  const text = freeze(["#text"]);
-  const html = freeze([
-    "accept",
-    "action",
-    "align",
-    "alt",
-    "autocapitalize",
-    "autocomplete",
-    "autopictureinpicture",
-    "autoplay",
-    "background",
-    "bgcolor",
-    "border",
-    "capture",
-    "cellpadding",
-    "cellspacing",
-    "checked",
-    "cite",
-    "class",
-    "clear",
-    "color",
-    "cols",
-    "colspan",
-    "command",
-    "commandfor",
-    "controls",
-    "controlslist",
-    "coords",
-    "crossorigin",
-    "datetime",
-    "decoding",
-    "default",
-    "dir",
-    "disabled",
-    "disablepictureinpicture",
-    "disableremoteplayback",
-    "download",
-    "draggable",
-    "enctype",
-    "enterkeyhint",
-    "exportparts",
-    "face",
-    "for",
-    "headers",
-    "height",
-    "hidden",
-    "high",
-    "href",
-    "hreflang",
-    "id",
-    "inert",
-    "inputmode",
-    "integrity",
-    "ismap",
-    "kind",
-    "label",
-    "lang",
-    "list",
-    "loading",
-    "loop",
-    "low",
-    "max",
-    "maxlength",
-    "media",
-    "method",
-    "min",
-    "minlength",
-    "multiple",
-    "muted",
-    "name",
-    "nonce",
-    "noshade",
-    "novalidate",
-    "nowrap",
-    "open",
-    "optimum",
-    "part",
-    "pattern",
-    "placeholder",
-    "playsinline",
-    "popover",
-    "popovertarget",
-    "popovertargetaction",
-    "poster",
-    "preload",
-    "pubdate",
-    "radiogroup",
-    "readonly",
-    "rel",
-    "required",
-    "rev",
-    "reversed",
-    "role",
-    "rows",
-    "rowspan",
-    "spellcheck",
-    "scope",
-    "selected",
-    "shape",
-    "size",
-    "sizes",
-    "slot",
-    "span",
-    "srclang",
-    "start",
-    "src",
-    "srcset",
-    "step",
-    "style",
-    "summary",
-    "tabindex",
-    "title",
-    "translate",
-    "type",
-    "usemap",
-    "valign",
-    "value",
-    "width",
-    "wrap",
-    "xmlns"
-  ]);
-  const svg = freeze([
-    "accent-height",
-    "accumulate",
-    "additive",
-    "alignment-baseline",
-    "amplitude",
-    "ascent",
-    "attributename",
-    "attributetype",
-    "azimuth",
-    "basefrequency",
-    "baseline-shift",
-    "begin",
-    "bias",
-    "by",
-    "class",
-    "clip",
-    "clippathunits",
-    "clip-path",
-    "clip-rule",
-    "color",
-    "color-interpolation",
-    "color-interpolation-filters",
-    "color-profile",
-    "color-rendering",
-    "cx",
-    "cy",
-    "d",
-    "dx",
-    "dy",
-    "diffuseconstant",
-    "direction",
-    "display",
-    "divisor",
-    "dominant-baseline",
-    "dur",
-    "edgemode",
-    "elevation",
-    "end",
-    "exponent",
-    "fill",
-    "fill-opacity",
-    "fill-rule",
-    "filter",
-    "filterunits",
-    "flood-color",
-    "flood-opacity",
-    "font-family",
-    "font-size",
-    "font-size-adjust",
-    "font-stretch",
-    "font-style",
-    "font-variant",
-    "font-weight",
-    "fx",
-    "fy",
-    "g1",
-    "g2",
-    "glyph-name",
-    "glyphref",
-    "gradientunits",
-    "gradienttransform",
-    "height",
-    "href",
-    "id",
-    "image-rendering",
-    "in",
-    "in2",
-    "intercept",
-    "k",
-    "k1",
-    "k2",
-    "k3",
-    "k4",
-    "kerning",
-    "keypoints",
-    "keysplines",
-    "keytimes",
-    "lang",
-    "lengthadjust",
-    "letter-spacing",
-    "kernelmatrix",
-    "kernelunitlength",
-    "lighting-color",
-    "local",
-    "marker-end",
-    "marker-mid",
-    "marker-start",
-    "markerheight",
-    "markerunits",
-    "markerwidth",
-    "maskcontentunits",
-    "maskunits",
-    "max",
-    "mask",
-    "mask-type",
-    "media",
-    "method",
-    "mode",
-    "min",
-    "name",
-    "numoctaves",
-    "offset",
-    "operator",
-    "opacity",
-    "order",
-    "orient",
-    "orientation",
-    "origin",
-    "overflow",
-    "paint-order",
-    "path",
-    "pathlength",
-    "patterncontentunits",
-    "patterntransform",
-    "patternunits",
-    "pointer-events",
-    "points",
-    "preservealpha",
-    "preserveaspectratio",
-    "primitiveunits",
-    "r",
-    "rx",
-    "ry",
-    "radius",
-    "refx",
-    "refy",
-    "repeatcount",
-    "repeatdur",
-    "restart",
-    "result",
-    "rotate",
-    "scale",
-    "seed",
-    "shape-rendering",
-    "slope",
-    "specularconstant",
-    "specularexponent",
-    "spreadmethod",
-    "startoffset",
-    "stddeviation",
-    "stitchtiles",
-    "stop-color",
-    "stop-opacity",
-    "stroke-dasharray",
-    "stroke-dashoffset",
-    "stroke-linecap",
-    "stroke-linejoin",
-    "stroke-miterlimit",
-    "stroke-opacity",
-    "stroke",
-    "stroke-width",
-    "style",
-    "surfacescale",
-    "systemlanguage",
-    "tabindex",
-    "tablevalues",
-    "targetx",
-    "targety",
-    "transform",
-    "transform-origin",
-    "text-anchor",
-    "text-decoration",
-    "text-orientation",
-    "text-rendering",
-    "textlength",
-    "type",
-    "u1",
-    "u2",
-    "unicode",
-    "values",
-    "vector-effect",
-    "viewbox",
-    "visibility",
-    "version",
-    "vert-adv-y",
-    "vert-origin-x",
-    "vert-origin-y",
-    "width",
-    "word-spacing",
-    "wrap",
-    "writing-mode",
-    "xchannelselector",
-    "ychannelselector",
-    "x",
-    "x1",
-    "x2",
-    "xmlns",
-    "y",
-    "y1",
-    "y2",
-    "z",
-    "zoomandpan"
-  ]);
-  const mathMl = freeze([
-    "accent",
-    "accentunder",
-    "align",
-    "bevelled",
-    "close",
-    "columnalign",
-    "columnlines",
-    "columnspacing",
-    "columnspan",
-    "denomalign",
-    "depth",
-    "dir",
-    "display",
-    "displaystyle",
-    "encoding",
-    "fence",
-    "frame",
-    "height",
-    "href",
-    "id",
-    "largeop",
-    "length",
-    "linethickness",
-    "lquote",
-    "lspace",
-    "mathbackground",
-    "mathcolor",
-    "mathsize",
-    "mathvariant",
-    "maxsize",
-    "minsize",
-    "movablelimits",
-    "notation",
-    "numalign",
-    "open",
-    "rowalign",
-    "rowlines",
-    "rowspacing",
-    "rowspan",
-    "rspace",
-    "rquote",
-    "scriptlevel",
-    "scriptminsize",
-    "scriptsizemultiplier",
-    "selection",
-    "separator",
-    "separators",
-    "stretchy",
-    "subscriptshift",
-    "supscriptshift",
-    "symmetric",
-    "voffset",
-    "width",
-    "xmlns"
-  ]);
-  const xml = freeze([
-    "xlink:href",
-    "xml:id",
-    "xlink:title",
-    "xml:space",
-    "xmlns:xlink"
-  ]);
-  const MUSTACHE_EXPR = seal(/{{[\w\W]*|^[\w\W]*}}/g);
-  const ERB_EXPR = seal(/<%[\w\W]*|^[\w\W]*%>/g);
-  const TMPLIT_EXPR = seal(/\${[\w\W]*/g);
-  const DATA_ATTR = seal(/^data-[\-\w.\u00B7-\uFFFF]+$/);
-  const ARIA_ATTR = seal(/^aria-[\-\w]+$/);
-  const IS_ALLOWED_URI = seal(/^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|matrix):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i);
-  const IS_SCRIPT_OR_DATA = seal(/^(?:\w+script|data):/i);
-  const ATTR_WHITESPACE = seal(/[\u0000-\u0020\u00A0\u1680\u180E\u2000-\u2029\u205F\u3000]/g);
-  const DOCTYPE_NAME = seal(/^html$/i);
-  const CUSTOM_ELEMENT = seal(/^[a-z][.\w]*(-[.\w]+)+$/i);
-  const ELEMENT_MARKUP_PROBE = seal(/<[/\w!]/g);
-  const COMMENT_MARKUP_PROBE = seal(/<[/\w]/g);
-  const FALLBACK_TAG_CLOSE = seal(/<\/no(script|embed|frames)/i);
-  const SELF_CLOSING_TAG = seal(/\/>/i);
-  const NODE_TYPE = {
-    element: 1,
-    attribute: 2,
-    text: 3,
-    cdataSection: 4,
-    entityReference: 5,
-    entityNode: 6,
-    processingInstruction: 7,
-    comment: 8,
-    document: 9,
-    documentType: 10,
-    documentFragment: 11,
-    notation: 12
-  };
-  const LITERAL_TEXT_ELEMENT_NAMES = [
-    "style",
-    "script",
-    "xmp",
-    "iframe",
-    "noembed",
-    "noframes",
-    "plaintext",
-    "noscript"
-  ];
-  const LITERAL_TEXT_ELEMENTS = freeze(addToSet({}, LITERAL_TEXT_ELEMENT_NAMES));
-  const LITERAL_TEXT_CLOSE = function() {
-    const map = {};
-    arrayForEach(LITERAL_TEXT_ELEMENT_NAMES, (name) => {
-      map[name] = seal(new RegExp("</" + name + "(?=[\\t\\n\\f\\r />])", "i"));
-    });
-    return freeze(map);
-  }();
-  const getGlobal = function getGlobal2() {
-    return typeof window === "undefined" ? null : window;
-  };
-  const _createTrustedTypesPolicy = function _createTrustedTypesPolicy2(trustedTypes, purifyHostElement) {
-    if (typeof trustedTypes !== "object" || typeof trustedTypes.createPolicy !== "function")
-      return null;
-    let suffix = null;
-    const ATTR_NAME = "data-tt-policy-suffix";
-    if (purifyHostElement && purifyHostElement.hasAttribute(ATTR_NAME))
-      suffix = purifyHostElement.getAttribute(ATTR_NAME);
-    const policyName = "dompurify" + (suffix ? "#" + suffix : "");
-    try {
-      return trustedTypes.createPolicy(policyName, {
-        createHTML(html2) {
-          return html2;
-        },
-        createScriptURL(scriptUrl) {
-          return scriptUrl;
-        }
-      });
-    } catch (_) {
-      console.warn("TrustedTypes policy " + policyName + " could not be created.");
-      return null;
-    }
-  };
-  const _createHooksMap = function _createHooksMap2() {
-    return {
-      afterSanitizeAttributes: [],
-      afterSanitizeElements: [],
-      afterSanitizeShadowDOM: [],
-      beforeSanitizeAttributes: [],
-      beforeSanitizeElements: [],
-      beforeSanitizeShadowDOM: [],
-      uponSanitizeAttribute: [],
-      uponSanitizeElement: [],
-      uponSanitizeShadowNode: []
-    };
-  };
-  const _resolveSetOption = function _resolveSetOption2(cfg, key, fallback, options) {
-    return objectHasOwnProperty(cfg, key) && arrayIsArray(cfg[key]) ? addToSet(options.base ? clone(options.base) : {}, cfg[key], options.transform) : fallback;
-  };
-  const _resolveObjectOption = function _resolveObjectOption2(cfg, key, makeFallback) {
-    const value = objectHasOwnProperty(cfg, key) ? cfg[key] : void 0;
-    return value && typeof value === "object" ? clone(value) : makeFallback();
-  };
-  function createDOMPurify() {
-    let window2 = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : getGlobal();
-    const DOMPurify = (root2) => createDOMPurify(root2);
-    DOMPurify.version = "3.4.16";
-    DOMPurify.removed = [];
-    if (!window2 || !window2.document || window2.document.nodeType !== NODE_TYPE.document || !window2.Element) {
-      DOMPurify.isSupported = false;
-      return DOMPurify;
-    }
-    let document2 = window2.document;
-    const originalDocument = document2;
-    const currentScript = originalDocument.currentScript;
-    window2.DocumentFragment;
-    const HTMLTemplateElement = window2.HTMLTemplateElement, Node2 = window2.Node, Element2 = window2.Element, NodeFilter2 = window2.NodeFilter;
-    window2.NamedNodeMap === void 0 && (window2.NamedNodeMap || window2.MozNamedAttrMap);
-    window2.HTMLFormElement;
-    const DOMParser2 = window2.DOMParser, trustedTypes = window2.trustedTypes;
-    const ElementPrototype = Element2.prototype;
-    const cloneNode = lookupGetter(ElementPrototype, "cloneNode");
-    const remove = lookupGetter(ElementPrototype, "remove");
-    const removeAttributeNode = lookupGetter(ElementPrototype, "removeAttributeNode");
-    const getNextSibling = lookupGetter(ElementPrototype, "nextSibling");
-    const getChildNodes = lookupGetter(ElementPrototype, "childNodes");
-    const getParentNode = lookupGetter(ElementPrototype, "parentNode");
-    const getShadowRoot = lookupGetter(ElementPrototype, "shadowRoot");
-    const getAttributes = lookupGetter(ElementPrototype, "attributes");
-    const getNodeType = Node2 && Node2.prototype ? lookupGetter(Node2.prototype, "nodeType") : null;
-    const getNodeName = Node2 && Node2.prototype ? lookupGetter(Node2.prototype, "nodeName") : null;
-    const getOwnerDocument = Node2 && Node2.prototype ? lookupGetter(Node2.prototype, "ownerDocument") : null;
-    const _readNodeType = function _readNodeType2(node) {
-      return getNodeType ? getNodeType(node) : node.nodeType;
-    };
-    const _readNodeName = function _readNodeName2(node) {
-      return getNodeName ? getNodeName(node) : node.nodeName;
-    };
-    if (typeof HTMLTemplateElement === "function") {
-      const template = document2.createElement("template");
-      if (template.content && template.content.ownerDocument)
-        document2 = template.content.ownerDocument;
-    }
-    let trustedTypesPolicy;
-    let emptyHTML = "";
-    let defaultTrustedTypesPolicy;
-    let defaultTrustedTypesPolicyResolved = false;
-    let IN_TRUSTED_TYPES_POLICY = 0;
-    const _assertNotInTrustedTypesPolicy = function _assertNotInTrustedTypesPolicy2() {
-      if (IN_TRUSTED_TYPES_POLICY > 0)
-        throw typeErrorCreate('A configured TRUSTED_TYPES_POLICY callback (createHTML or createScriptURL) must not call DOMPurify.sanitize, as that causes infinite recursion. Do not pass a policy whose callbacks wrap DOMPurify as TRUSTED_TYPES_POLICY; see the "DOMPurify and Trusted Types" section of the README.');
-    };
-    const _createTrustedHTML = function _createTrustedHTML2(html2) {
-      _assertNotInTrustedTypesPolicy();
-      IN_TRUSTED_TYPES_POLICY++;
-      try {
-        return trustedTypesPolicy.createHTML(html2);
-      } finally {
-        IN_TRUSTED_TYPES_POLICY--;
-      }
-    };
-    const _createTrustedScriptURL = function _createTrustedScriptURL2(scriptUrl) {
-      _assertNotInTrustedTypesPolicy();
-      IN_TRUSTED_TYPES_POLICY++;
-      try {
-        return trustedTypesPolicy.createScriptURL(scriptUrl);
-      } finally {
-        IN_TRUSTED_TYPES_POLICY--;
-      }
-    };
-    const _getDefaultTrustedTypesPolicy = function _getDefaultTrustedTypesPolicy2() {
-      if (!defaultTrustedTypesPolicyResolved) {
-        defaultTrustedTypesPolicy = _createTrustedTypesPolicy(trustedTypes, currentScript);
-        defaultTrustedTypesPolicyResolved = true;
-      }
-      return defaultTrustedTypesPolicy;
-    };
-    const _document = document2, implementation = _document.implementation, createNodeIterator = _document.createNodeIterator, createDocumentFragment = _document.createDocumentFragment, getElementsByTagName = _document.getElementsByTagName;
-    const importNode = originalDocument.importNode;
-    let hooks = _createHooksMap();
-    DOMPurify.isSupported = typeof entries === "function" && typeof getParentNode === "function" && implementation && implementation.createHTMLDocument !== void 0;
-    const MUSTACHE_EXPR$1 = MUSTACHE_EXPR, ERB_EXPR$1 = ERB_EXPR, TMPLIT_EXPR$1 = TMPLIT_EXPR, DATA_ATTR$1 = DATA_ATTR, ARIA_ATTR$1 = ARIA_ATTR, IS_SCRIPT_OR_DATA$1 = IS_SCRIPT_OR_DATA, ATTR_WHITESPACE$1 = ATTR_WHITESPACE, CUSTOM_ELEMENT$1 = CUSTOM_ELEMENT;
-    let IS_ALLOWED_URI$1 = IS_ALLOWED_URI;
-    let ALLOWED_TAGS = null;
-    const DEFAULT_ALLOWED_TAGS = addToSet({}, [
-      ...html$1,
-      ...svg$1,
-      ...svgFilters,
-      ...mathMl$1,
-      ...text
-    ]);
-    let ALLOWED_ATTR = null;
-    const DEFAULT_ALLOWED_ATTR = addToSet({}, [
-      ...html,
-      ...svg,
-      ...mathMl,
-      ...xml
-    ]);
-    let CUSTOM_ELEMENT_HANDLING = Object.seal(create(null, {
-      tagNameCheck: {
-        writable: true,
-        configurable: false,
-        enumerable: true,
-        value: null
-      },
-      attributeNameCheck: {
-        writable: true,
-        configurable: false,
-        enumerable: true,
-        value: null
-      },
-      allowCustomizedBuiltInElements: {
-        writable: true,
-        configurable: false,
-        enumerable: true,
-        value: false
-      }
-    }));
-    let FORBID_TAGS = null;
-    let FORBID_ATTR = null;
-    const EXTRA_ELEMENT_HANDLING = Object.seal(create(null, {
-      tagCheck: {
-        writable: true,
-        configurable: false,
-        enumerable: true,
-        value: null
-      },
-      attributeCheck: {
-        writable: true,
-        configurable: false,
-        enumerable: true,
-        value: null
-      }
-    }));
-    let ALLOW_ARIA_ATTR = true;
-    let ALLOW_DATA_ATTR = true;
-    let ALLOW_UNKNOWN_PROTOCOLS = false;
-    let ALLOW_SELF_CLOSE_IN_ATTR = true;
-    let SAFE_FOR_TEMPLATES = false;
-    let SAFE_FOR_XML = true;
-    let WHOLE_DOCUMENT = false;
-    let SET_CONFIG = false;
-    let SET_CONFIG_ALLOWED_TAGS = null;
-    let SET_CONFIG_ALLOWED_ATTR = null;
-    let FORCE_BODY = false;
-    let RETURN_DOM = false;
-    let RETURN_DOM_FRAGMENT = false;
-    let RETURN_TRUSTED_TYPE = false;
-    let SANITIZE_DOM = true;
-    let SANITIZE_NAMED_PROPS = false;
-    const SANITIZE_NAMED_PROPS_PREFIX = "user-content-";
-    let KEEP_CONTENT = true;
-    let IN_PLACE = false;
-    let USE_PROFILES = {};
-    let FORBID_CONTENTS = null;
-    const DEFAULT_FORBID_CONTENTS = addToSet({}, [
-      "annotation-xml",
-      "audio",
-      "colgroup",
-      "desc",
-      "foreignobject",
-      "head",
-      "iframe",
-      "math",
-      "mi",
-      "mn",
-      "mo",
-      "ms",
-      "mtext",
-      "noembed",
-      "noframes",
-      "noscript",
-      "plaintext",
-      "script",
-      "selectedcontent",
-      "style",
-      "svg",
-      "template",
-      "thead",
-      "title",
-      "video",
-      "xmp"
-    ]);
-    let DATA_URI_TAGS = null;
-    const DEFAULT_DATA_URI_TAGS = addToSet({}, [
-      "audio",
-      "video",
-      "img",
-      "source",
-      "image",
-      "track"
-    ]);
-    let URI_SAFE_ATTRIBUTES = null;
-    const DEFAULT_URI_SAFE_ATTRIBUTES = addToSet({}, [
-      "alt",
-      "class",
-      "for",
-      "id",
-      "label",
-      "name",
-      "pattern",
-      "placeholder",
-      "role",
-      "summary",
-      "title",
-      "value",
-      "style",
-      "xmlns"
-    ]);
-    const MATHML_NAMESPACE = "http://www.w3.org/1998/Math/MathML";
-    const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
-    const HTML_NAMESPACE = "http://www.w3.org/1999/xhtml";
-    let NAMESPACE = HTML_NAMESPACE;
-    let IS_EMPTY_INPUT = false;
-    let ALLOWED_NAMESPACES = null;
-    const DEFAULT_ALLOWED_NAMESPACES = addToSet({}, [
-      MATHML_NAMESPACE,
-      SVG_NAMESPACE,
-      HTML_NAMESPACE
-    ], stringToString);
-    const DEFAULT_MATHML_TEXT_INTEGRATION_POINTS = freeze([
-      "mi",
-      "mo",
-      "mn",
-      "ms",
-      "mtext"
-    ]);
-    let MATHML_TEXT_INTEGRATION_POINTS = addToSet({}, DEFAULT_MATHML_TEXT_INTEGRATION_POINTS);
-    const DEFAULT_HTML_INTEGRATION_POINTS = freeze(["annotation-xml"]);
-    let HTML_INTEGRATION_POINTS = addToSet({}, DEFAULT_HTML_INTEGRATION_POINTS);
-    const COMMON_SVG_AND_HTML_ELEMENTS = addToSet({}, [
-      "title",
-      "style",
-      "font",
-      "a",
-      "script"
-    ]);
-    let PARSER_MEDIA_TYPE = null;
-    const SUPPORTED_PARSER_MEDIA_TYPES = ["application/xhtml+xml", "text/html"];
-    const DEFAULT_PARSER_MEDIA_TYPE = "text/html";
-    let transformCaseFunc = null;
-    let CONFIG = null;
-    const formElement = document2.createElement("form");
-    const isRegexOrFunction = function isRegexOrFunction2(testValue) {
-      return testValue instanceof RegExp || testValue instanceof Function;
-    };
-    const _parseConfig = function _parseConfig2() {
-      let cfg = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {};
-      if (CONFIG && CONFIG === cfg)
-        return;
-      if (!cfg || typeof cfg !== "object")
-        cfg = {};
-      cfg = clone(cfg);
-      PARSER_MEDIA_TYPE = SUPPORTED_PARSER_MEDIA_TYPES.indexOf(cfg.PARSER_MEDIA_TYPE) === -1 ? DEFAULT_PARSER_MEDIA_TYPE : cfg.PARSER_MEDIA_TYPE;
-      transformCaseFunc = PARSER_MEDIA_TYPE === "application/xhtml+xml" ? stringToString : stringToLowerCase;
-      ALLOWED_TAGS = _resolveSetOption(cfg, "ALLOWED_TAGS", DEFAULT_ALLOWED_TAGS, { transform: transformCaseFunc });
-      ALLOWED_ATTR = _resolveSetOption(cfg, "ALLOWED_ATTR", DEFAULT_ALLOWED_ATTR, { transform: transformCaseFunc });
-      ALLOWED_NAMESPACES = _resolveSetOption(cfg, "ALLOWED_NAMESPACES", DEFAULT_ALLOWED_NAMESPACES, { transform: stringToString });
-      URI_SAFE_ATTRIBUTES = _resolveSetOption(cfg, "ADD_URI_SAFE_ATTR", DEFAULT_URI_SAFE_ATTRIBUTES, {
-        transform: transformCaseFunc,
-        base: DEFAULT_URI_SAFE_ATTRIBUTES
-      });
-      DATA_URI_TAGS = _resolveSetOption(cfg, "ADD_DATA_URI_TAGS", DEFAULT_DATA_URI_TAGS, {
-        transform: transformCaseFunc,
-        base: DEFAULT_DATA_URI_TAGS
-      });
-      FORBID_CONTENTS = _resolveSetOption(cfg, "FORBID_CONTENTS", DEFAULT_FORBID_CONTENTS, { transform: transformCaseFunc });
-      FORBID_TAGS = _resolveSetOption(cfg, "FORBID_TAGS", clone({}), { transform: transformCaseFunc });
-      FORBID_ATTR = _resolveSetOption(cfg, "FORBID_ATTR", clone({}), { transform: transformCaseFunc });
-      USE_PROFILES = objectHasOwnProperty(cfg, "USE_PROFILES") ? cfg.USE_PROFILES && typeof cfg.USE_PROFILES === "object" ? clone(cfg.USE_PROFILES) : cfg.USE_PROFILES : false;
-      ALLOW_ARIA_ATTR = cfg.ALLOW_ARIA_ATTR !== false;
-      ALLOW_DATA_ATTR = cfg.ALLOW_DATA_ATTR !== false;
-      ALLOW_UNKNOWN_PROTOCOLS = cfg.ALLOW_UNKNOWN_PROTOCOLS || false;
-      ALLOW_SELF_CLOSE_IN_ATTR = cfg.ALLOW_SELF_CLOSE_IN_ATTR !== false;
-      SAFE_FOR_TEMPLATES = cfg.SAFE_FOR_TEMPLATES || false;
-      SAFE_FOR_XML = cfg.SAFE_FOR_XML !== false;
-      WHOLE_DOCUMENT = cfg.WHOLE_DOCUMENT || false;
-      RETURN_DOM = cfg.RETURN_DOM || false;
-      RETURN_DOM_FRAGMENT = cfg.RETURN_DOM_FRAGMENT || false;
-      RETURN_TRUSTED_TYPE = cfg.RETURN_TRUSTED_TYPE || false;
-      FORCE_BODY = cfg.FORCE_BODY || false;
-      SANITIZE_DOM = cfg.SANITIZE_DOM !== false;
-      SANITIZE_NAMED_PROPS = cfg.SANITIZE_NAMED_PROPS || false;
-      KEEP_CONTENT = cfg.KEEP_CONTENT !== false;
-      IN_PLACE = cfg.IN_PLACE || false;
-      IS_ALLOWED_URI$1 = isRegex(cfg.ALLOWED_URI_REGEXP) ? cfg.ALLOWED_URI_REGEXP : IS_ALLOWED_URI;
-      NAMESPACE = typeof cfg.NAMESPACE === "string" ? cfg.NAMESPACE : HTML_NAMESPACE;
-      MATHML_TEXT_INTEGRATION_POINTS = _resolveObjectOption(cfg, "MATHML_TEXT_INTEGRATION_POINTS", () => addToSet({}, DEFAULT_MATHML_TEXT_INTEGRATION_POINTS));
-      HTML_INTEGRATION_POINTS = _resolveObjectOption(cfg, "HTML_INTEGRATION_POINTS", () => addToSet({}, DEFAULT_HTML_INTEGRATION_POINTS));
-      const customElementHandling = _resolveObjectOption(cfg, "CUSTOM_ELEMENT_HANDLING", () => create(null));
-      CUSTOM_ELEMENT_HANDLING = create(null);
-      if (objectHasOwnProperty(customElementHandling, "tagNameCheck") && isRegexOrFunction(customElementHandling.tagNameCheck))
-        CUSTOM_ELEMENT_HANDLING.tagNameCheck = customElementHandling.tagNameCheck;
-      if (objectHasOwnProperty(customElementHandling, "attributeNameCheck") && isRegexOrFunction(customElementHandling.attributeNameCheck))
-        CUSTOM_ELEMENT_HANDLING.attributeNameCheck = customElementHandling.attributeNameCheck;
-      if (objectHasOwnProperty(customElementHandling, "allowCustomizedBuiltInElements") && typeof customElementHandling.allowCustomizedBuiltInElements === "boolean")
-        CUSTOM_ELEMENT_HANDLING.allowCustomizedBuiltInElements = customElementHandling.allowCustomizedBuiltInElements;
-      seal(CUSTOM_ELEMENT_HANDLING);
-      if (SAFE_FOR_TEMPLATES)
-        ALLOW_DATA_ATTR = false;
-      if (RETURN_DOM_FRAGMENT)
-        RETURN_DOM = true;
-      if (USE_PROFILES) {
-        ALLOWED_TAGS = addToSet({}, text);
-        ALLOWED_ATTR = create(null);
-        if (USE_PROFILES.html === true) {
-          addToSet(ALLOWED_TAGS, html$1);
-          addToSet(ALLOWED_ATTR, html);
-        }
-        if (USE_PROFILES.svg === true) {
-          addToSet(ALLOWED_TAGS, svg$1);
-          addToSet(ALLOWED_ATTR, svg);
-          addToSet(ALLOWED_ATTR, xml);
-        }
-        if (USE_PROFILES.svgFilters === true) {
-          addToSet(ALLOWED_TAGS, svgFilters);
-          addToSet(ALLOWED_ATTR, svg);
-          addToSet(ALLOWED_ATTR, xml);
-        }
-        if (USE_PROFILES.mathMl === true) {
-          addToSet(ALLOWED_TAGS, mathMl$1);
-          addToSet(ALLOWED_ATTR, mathMl);
-          addToSet(ALLOWED_ATTR, xml);
-        }
-      }
-      EXTRA_ELEMENT_HANDLING.tagCheck = null;
-      EXTRA_ELEMENT_HANDLING.attributeCheck = null;
-      if (objectHasOwnProperty(cfg, "ADD_TAGS")) {
-        if (typeof cfg.ADD_TAGS === "function")
-          EXTRA_ELEMENT_HANDLING.tagCheck = cfg.ADD_TAGS;
-        else if (arrayIsArray(cfg.ADD_TAGS)) {
-          if (ALLOWED_TAGS === DEFAULT_ALLOWED_TAGS)
-            ALLOWED_TAGS = clone(ALLOWED_TAGS);
-          addToSet(ALLOWED_TAGS, cfg.ADD_TAGS, transformCaseFunc);
-        }
-      }
-      if (objectHasOwnProperty(cfg, "ADD_ATTR")) {
-        if (typeof cfg.ADD_ATTR === "function")
-          EXTRA_ELEMENT_HANDLING.attributeCheck = cfg.ADD_ATTR;
-        else if (arrayIsArray(cfg.ADD_ATTR)) {
-          if (ALLOWED_ATTR === DEFAULT_ALLOWED_ATTR)
-            ALLOWED_ATTR = clone(ALLOWED_ATTR);
-          addToSet(ALLOWED_ATTR, cfg.ADD_ATTR, transformCaseFunc);
-        }
-      }
-      if (objectHasOwnProperty(cfg, "ADD_FORBID_CONTENTS") && arrayIsArray(cfg.ADD_FORBID_CONTENTS)) {
-        if (FORBID_CONTENTS === DEFAULT_FORBID_CONTENTS)
-          FORBID_CONTENTS = clone(FORBID_CONTENTS);
-        addToSet(FORBID_CONTENTS, cfg.ADD_FORBID_CONTENTS, transformCaseFunc);
-      }
-      if (KEEP_CONTENT)
-        ALLOWED_TAGS["#text"] = true;
-      if (WHOLE_DOCUMENT)
-        addToSet(ALLOWED_TAGS, [
-          "html",
-          "head",
-          "body"
-        ]);
-      if (ALLOWED_TAGS.table) {
-        addToSet(ALLOWED_TAGS, ["tbody"]);
-        delete FORBID_TAGS.tbody;
-      }
-      if (cfg.TRUSTED_TYPES_POLICY) {
-        if (typeof cfg.TRUSTED_TYPES_POLICY.createHTML !== "function")
-          throw typeErrorCreate('TRUSTED_TYPES_POLICY configuration option must provide a "createHTML" hook.');
-        if (typeof cfg.TRUSTED_TYPES_POLICY.createScriptURL !== "function")
-          throw typeErrorCreate('TRUSTED_TYPES_POLICY configuration option must provide a "createScriptURL" hook.');
-        const previousTrustedTypesPolicy = trustedTypesPolicy;
-        trustedTypesPolicy = cfg.TRUSTED_TYPES_POLICY;
-        try {
-          emptyHTML = _createTrustedHTML("");
-        } catch (error) {
-          trustedTypesPolicy = previousTrustedTypesPolicy;
-          throw error;
-        }
-      } else if (cfg.TRUSTED_TYPES_POLICY === null) {
-        trustedTypesPolicy = void 0;
-        emptyHTML = "";
-      } else {
-        if (trustedTypesPolicy === void 0)
-          trustedTypesPolicy = _getDefaultTrustedTypesPolicy();
-        if (trustedTypesPolicy && typeof emptyHTML === "string")
-          emptyHTML = _createTrustedHTML("");
-      }
-      if (freeze)
-        freeze(cfg);
-      CONFIG = cfg;
-    };
-    const ALL_SVG_TAGS = addToSet({}, [
-      ...svg$1,
-      ...svgFilters,
-      ...svgDisallowed
-    ]);
-    const ALL_MATHML_TAGS = addToSet({}, [...mathMl$1, ...mathMlDisallowed]);
-    const _checkSvgNamespace = function _checkSvgNamespace2(tagName, parent, parentTagName) {
-      if (parent.namespaceURI === HTML_NAMESPACE)
-        return tagName === "svg";
-      if (parent.namespaceURI === MATHML_NAMESPACE)
-        return tagName === "svg" && (parentTagName === "annotation-xml" || MATHML_TEXT_INTEGRATION_POINTS[parentTagName]);
-      return Boolean(ALL_SVG_TAGS[tagName]);
-    };
-    const _checkMathMlNamespace = function _checkMathMlNamespace2(tagName, parent, parentTagName) {
-      if (parent.namespaceURI === HTML_NAMESPACE)
-        return tagName === "math";
-      if (parent.namespaceURI === SVG_NAMESPACE)
-        return tagName === "math" && HTML_INTEGRATION_POINTS[parentTagName];
-      return Boolean(ALL_MATHML_TAGS[tagName]);
-    };
-    const _checkHtmlNamespace = function _checkHtmlNamespace2(tagName, parent, parentTagName) {
-      if (parent.namespaceURI === SVG_NAMESPACE && !HTML_INTEGRATION_POINTS[parentTagName])
-        return false;
-      if (parent.namespaceURI === MATHML_NAMESPACE && !MATHML_TEXT_INTEGRATION_POINTS[parentTagName])
-        return false;
-      return !ALL_MATHML_TAGS[tagName] && (COMMON_SVG_AND_HTML_ELEMENTS[tagName] || !ALL_SVG_TAGS[tagName]);
-    };
-    const _checkValidNamespace = function _checkValidNamespace2(element) {
-      let parent = getParentNode(element);
-      if (!parent || !parent.tagName)
-        parent = {
-          namespaceURI: NAMESPACE,
-          tagName: "template"
-        };
-      const tagName = stringToLowerCase(element.tagName);
-      const parentTagName = stringToLowerCase(parent.tagName);
-      if (!ALLOWED_NAMESPACES[element.namespaceURI])
-        return false;
-      if (element.namespaceURI === SVG_NAMESPACE)
-        return _checkSvgNamespace(tagName, parent, parentTagName);
-      if (element.namespaceURI === MATHML_NAMESPACE)
-        return _checkMathMlNamespace(tagName, parent, parentTagName);
-      if (element.namespaceURI === HTML_NAMESPACE)
-        return _checkHtmlNamespace(tagName, parent, parentTagName);
-      if (PARSER_MEDIA_TYPE === "application/xhtml+xml" && ALLOWED_NAMESPACES[element.namespaceURI])
-        return true;
-      return false;
-    };
-    const _forceRemove = function _forceRemove2(node) {
-      arrayPush(DOMPurify.removed, { element: node });
-      try {
-        getParentNode(node).removeChild(node);
-      } catch (_) {
-        remove(node);
-        if (!getParentNode(node))
-          throw typeErrorCreate("a node selected for removal could not be detached from its tree and cannot be safely returned; refusing to sanitize in place");
-      }
-    };
-    const _stripAttributeNode = function _stripAttributeNode2(element, attribute, name) {
-      try {
-        removeAttributeNode(element, attribute);
-      } catch (_) {
-        try {
-          element.removeAttribute(name);
-        } catch (_2) {
-        }
-      }
-    };
-    const _neutralizeRoot = function _neutralizeRoot2(root2) {
-      _neutralizeSubtree(root2);
-      const childNodes = getChildNodes(root2);
-      if (childNodes) {
-        const snapshot = [];
-        arrayForEach(childNodes, (child) => {
-          arrayPush(snapshot, child);
-        });
-        arrayForEach(snapshot, (child) => {
-          try {
-            remove(child);
-          } catch (_) {
-          }
-        });
-      }
-      const attributes = getAttributes(root2);
-      if (attributes)
-        for (let i = attributes.length - 1; i >= 0; --i) {
-          const attribute = attributes[i];
-          const name = attribute && attribute.name;
-          if (typeof name === "string")
-            _stripAttributeNode(root2, attribute, name);
-        }
-    };
-    const _removeAttribute = function _removeAttribute2(name, element, attr) {
-      if (!attr)
-        try {
-          attr = element.getAttributeNode(name);
-        } catch (_) {
-          attr = null;
-        }
-      arrayPush(DOMPurify.removed, {
-        attribute: attr || null,
-        from: element
-      });
-      try {
-        if (attr)
-          removeAttributeNode(element, attr);
-        else
-          element.removeAttribute(name);
-      } catch (_) {
-        try {
-          element.removeAttribute(name);
-        } catch (_2) {
-        }
-      }
-      if (name === "is") {
-        if (RETURN_DOM || RETURN_DOM_FRAGMENT)
-          try {
-            _forceRemove(element);
-          } catch (_) {
-          }
-        else
-          try {
-            element.setAttribute(name, "");
-          } catch (_) {
-          }
-      }
-    };
-    const _stripDisallowedAttributes = function _stripDisallowedAttributes2(element) {
-      const attributes = getAttributes(element);
-      if (!attributes)
-        return;
-      for (let i = attributes.length - 1; i >= 0; --i) {
-        const attribute = attributes[i];
-        const name = attribute && attribute.name;
-        if (typeof name !== "string" || ALLOWED_ATTR[transformCaseFunc(name)])
-          continue;
-        _stripAttributeNode(element, attribute, name);
-      }
-    };
-    const _neutralizeSubtree = function _neutralizeSubtree2(root2) {
-      const stack = [root2];
-      while (stack.length > 0) {
-        const node = stack.pop();
-        if (_readNodeType(node) === NODE_TYPE.element)
-          _stripDisallowedAttributes(node);
-        const childNodes = getChildNodes(node);
-        if (childNodes)
-          for (let i = childNodes.length - 1; i >= 0; --i)
-            stack.push(childNodes[i]);
-      }
-    };
-    const _isPatchLinkageAttribute = function _isPatchLinkageAttribute2(lcName, lcTag) {
-      if (!SAFE_FOR_XML)
-        return false;
-      if (lcName === "patchsrc")
-        return true;
-      return lcName === "for" && lcTag !== "label" && lcTag !== "output";
-    };
-    const _neutralizePatchLinkage = function _neutralizePatchLinkage2(root2) {
-      if (!SAFE_FOR_XML)
-        return;
-      const stack = [root2];
-      while (stack.length > 0) {
-        const node = stack.pop();
-        const nodeType = _readNodeType(node);
-        if (nodeType === NODE_TYPE.processingInstruction || nodeType === NODE_TYPE.comment && regExpTest(COMMENT_MARKUP_PROBE, node.data)) {
-          try {
-            remove(node);
-          } catch (_) {
-          }
-          continue;
-        }
-        if (nodeType === NODE_TYPE.element) {
-          const element = node;
-          const lcTag = transformCaseFunc(_readNodeName(node));
-          try {
-            if (element.hasAttribute && element.hasAttribute("patchsrc"))
-              element.removeAttribute("patchsrc");
-            if (element.hasAttribute && element.hasAttribute("for") && _isPatchLinkageAttribute("for", lcTag))
-              element.removeAttribute("for");
-          } catch (_) {
-          }
-        }
-        const childNodes = getChildNodes(node);
-        if (childNodes)
-          for (let i = childNodes.length - 1; i >= 0; --i)
-            stack.push(childNodes[i]);
-      }
-    };
-    const _initDocument = function _initDocument2(dirty) {
-      let doc = null;
-      let leadingWhitespace = null;
-      if (FORCE_BODY)
-        dirty = "<remove></remove>" + dirty;
-      else {
-        const matches2 = stringMatch(dirty, /^[\r\n\t ]+/);
-        leadingWhitespace = matches2 && matches2[0];
-      }
-      if (PARSER_MEDIA_TYPE === "application/xhtml+xml" && NAMESPACE === HTML_NAMESPACE)
-        dirty = '<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body>' + dirty + "</body></html>";
-      const dirtyPayload = trustedTypesPolicy ? _createTrustedHTML(dirty) : dirty;
-      if (NAMESPACE === HTML_NAMESPACE)
-        try {
-          doc = new DOMParser2().parseFromString(dirtyPayload, PARSER_MEDIA_TYPE);
-        } catch (_) {
-        }
-      if (!doc || !doc.documentElement) {
-        doc = implementation.createDocument(NAMESPACE, "template", null);
-        try {
-          doc.documentElement.innerHTML = IS_EMPTY_INPUT ? emptyHTML : dirtyPayload;
-        } catch (_) {
-        }
-      }
-      const body = doc.body || doc.documentElement;
-      if (dirty && leadingWhitespace)
-        body.insertBefore(document2.createTextNode(leadingWhitespace), body.childNodes[0] || null);
-      if (NAMESPACE === HTML_NAMESPACE)
-        return getElementsByTagName.call(doc, WHOLE_DOCUMENT ? "html" : "body")[0];
-      return WHOLE_DOCUMENT ? doc.documentElement : body;
-    };
-    const _createNodeIterator = function _createNodeIterator2(root2) {
-      const doc = getOwnerDocument ? getOwnerDocument(root2) : root2.ownerDocument;
-      return createNodeIterator.call(doc || root2, root2, NodeFilter2.SHOW_ELEMENT | NodeFilter2.SHOW_COMMENT | NodeFilter2.SHOW_TEXT | NodeFilter2.SHOW_PROCESSING_INSTRUCTION | NodeFilter2.SHOW_CDATA_SECTION, null);
-    };
-    const _stripTemplateExpressions = function _stripTemplateExpressions2(value) {
-      value = stringReplace(value, MUSTACHE_EXPR$1, " ");
-      value = stringReplace(value, ERB_EXPR$1, " ");
-      value = stringReplace(value, TMPLIT_EXPR$1, " ");
-      return value;
-    };
-    const _scrubTemplateExpressions2 = function _scrubTemplateExpressions(node) {
-      var _node$querySelectorAl;
-      node.normalize();
-      const doc = getOwnerDocument ? getOwnerDocument(node) : node.ownerDocument;
-      const walker = createNodeIterator.call(doc || node, node, NodeFilter2.SHOW_TEXT | NodeFilter2.SHOW_COMMENT | NodeFilter2.SHOW_CDATA_SECTION | NodeFilter2.SHOW_PROCESSING_INSTRUCTION, null);
-      let currentNode = walker.nextNode();
-      while (currentNode) {
-        currentNode.data = _stripTemplateExpressions(currentNode.data);
-        currentNode = walker.nextNode();
-      }
-      const templates = (_node$querySelectorAl = node.querySelectorAll) === null || _node$querySelectorAl === void 0 ? void 0 : _node$querySelectorAl.call(node, "template");
-      if (templates)
-        arrayForEach(templates, (tmpl) => {
-          if (_isDocumentFragment(tmpl.content))
-            _scrubTemplateExpressions2(tmpl.content);
-        });
-    };
-    const _isClobbered = function _isClobbered2(element) {
-      const realTagName = getNodeName ? getNodeName(element) : null;
-      if (typeof realTagName !== "string")
-        return false;
-      if (transformCaseFunc(realTagName) !== "form")
-        return false;
-      return typeof element.nodeName !== "string" || typeof element.textContent !== "string" || typeof element.removeChild !== "function" || element.attributes !== getAttributes(element) || typeof element.removeAttribute !== "function" || typeof element.removeAttributeNode !== "function" || typeof element.getAttributeNode !== "function" || typeof element.setAttribute !== "function" || typeof element.namespaceURI !== "string" || typeof element.insertBefore !== "function" || typeof element.hasChildNodes !== "function" || element.nodeType !== getNodeType(element) || element.childNodes !== getChildNodes(element);
-    };
-    const _isDocumentFragment = function _isDocumentFragment2(value) {
-      if (!getNodeType || typeof value !== "object" || value === null)
-        return false;
-      try {
-        return getNodeType(value) === NODE_TYPE.documentFragment;
-      } catch (_) {
-        return false;
-      }
-    };
-    const _isNode = function _isNode2(value) {
-      if (!getNodeType || typeof value !== "object" || value === null)
-        return false;
-      try {
-        return typeof getNodeType(value) === "number";
-      } catch (_) {
-        return false;
-      }
-    };
-    function _executeHooks(hooks2, currentNode, data) {
-      if (hooks2.length === 0)
-        return;
-      arrayForEach(hooks2, (hook) => {
-        hook.call(DOMPurify, currentNode, data, CONFIG);
-      });
-    }
-    const _isUnsafeNode = function _isUnsafeNode2(currentNode, tagName) {
-      if (SAFE_FOR_XML && currentNode.hasChildNodes() && !_isNode(currentNode.firstElementChild) && regExpTest(ELEMENT_MARKUP_PROBE, currentNode.textContent) && regExpTest(ELEMENT_MARKUP_PROBE, currentNode.innerHTML))
-        return true;
-      if (SAFE_FOR_XML && currentNode.namespaceURI === HTML_NAMESPACE && LITERAL_TEXT_ELEMENTS[tagName] && (_isNode(currentNode.firstElementChild) || typeof currentNode.textContent === "string" && regExpTest(LITERAL_TEXT_CLOSE[tagName], currentNode.textContent)))
-        return true;
-      if (currentNode.nodeType === NODE_TYPE.processingInstruction)
-        return true;
-      if (SAFE_FOR_XML && currentNode.nodeType === NODE_TYPE.comment && regExpTest(COMMENT_MARKUP_PROBE, currentNode.data))
-        return true;
-      return false;
-    };
-    const _matchesNameCheck = function _matchesNameCheck2(check, name) {
-      if (check instanceof RegExp)
-        return regExpTest(check, name);
-      if (check instanceof Function) {
-        for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++)
-          args[_key - 2] = arguments[_key];
-        return Boolean(check(name, ...args));
-      }
-      return false;
-    };
-    const _sanitizeDisallowedNode = function _sanitizeDisallowedNode2(currentNode, tagName, root2) {
-      if (!FORBID_TAGS[tagName] && _isBasicCustomElement(tagName) && _matchesNameCheck(CUSTOM_ELEMENT_HANDLING.tagNameCheck, tagName))
-        return false;
-      if (KEEP_CONTENT && !FORBID_CONTENTS[tagName]) {
-        const parentNode = getParentNode(currentNode);
-        const childNodes = getChildNodes(currentNode);
-        if (childNodes && parentNode) {
-          const childCount = childNodes.length;
-          for (let i = childCount - 1; i >= 0; --i) {
-            const hoisted = currentNode === root2 ? cloneNode(childNodes[i], true) : childNodes[i];
-            parentNode.insertBefore(hoisted, getNextSibling(currentNode));
-          }
-        }
-      }
-      _forceRemove(currentNode);
-      return true;
-    };
-    const _forkSharedAllowlist = function _forkSharedAllowlist2(hookList, set, defaultSet, setConfigSet) {
-      if (hookList.length === 0)
-        return set;
-      return set === defaultSet || set === setConfigSet ? clone(set) : set;
-    };
-    const _handleHookDetachedNode = function _handleHookDetachedNode2(currentNode, root2) {
-      if (currentNode === root2 || getParentNode(currentNode) !== null)
-        return false;
-      if (IN_PLACE)
-        _neutralizeSubtree(currentNode);
-      return true;
-    };
-    const _sanitizeElements = function _sanitizeElements2(currentNode, root2) {
-      _executeHooks(hooks.beforeSanitizeElements, currentNode, null);
-      if (_handleHookDetachedNode(currentNode, root2))
-        return true;
-      if (_isClobbered(currentNode)) {
-        _forceRemove(currentNode);
-        return true;
-      }
-      const tagName = transformCaseFunc(_readNodeName(currentNode));
-      ALLOWED_TAGS = _forkSharedAllowlist(hooks.uponSanitizeElement, ALLOWED_TAGS, DEFAULT_ALLOWED_TAGS, SET_CONFIG_ALLOWED_TAGS);
-      _executeHooks(hooks.uponSanitizeElement, currentNode, {
-        tagName,
-        allowedTags: ALLOWED_TAGS
-      });
-      if (_handleHookDetachedNode(currentNode, root2))
-        return true;
-      if (_isUnsafeNode(currentNode, tagName)) {
-        _forceRemove(currentNode);
-        return true;
-      }
-      if (FORBID_TAGS[tagName] || !(EXTRA_ELEMENT_HANDLING.tagCheck instanceof Function && EXTRA_ELEMENT_HANDLING.tagCheck(tagName)) && !ALLOWED_TAGS[tagName]) {
-        const removed = _sanitizeDisallowedNode(currentNode, tagName, root2);
-        if (removed === false) {
-          _executeHooks(hooks.afterSanitizeElements, currentNode, null);
-          if (_handleHookDetachedNode(currentNode, root2))
-            return true;
-        }
-        return removed;
-      }
-      if (_readNodeType(currentNode) === NODE_TYPE.element && !_checkValidNamespace(currentNode)) {
-        _forceRemove(currentNode);
-        return true;
-      }
-      if ((tagName === "noscript" || tagName === "noembed" || tagName === "noframes") && regExpTest(FALLBACK_TAG_CLOSE, currentNode.innerHTML)) {
-        _forceRemove(currentNode);
-        return true;
-      }
-      if (SAFE_FOR_TEMPLATES && currentNode.nodeType === NODE_TYPE.text) {
-        const content = _stripTemplateExpressions(currentNode.textContent);
-        if (currentNode.textContent !== content) {
-          arrayPush(DOMPurify.removed, { element: currentNode.cloneNode() });
-          currentNode.textContent = content;
-        }
-      }
-      _executeHooks(hooks.afterSanitizeElements, currentNode, null);
-      return _handleHookDetachedNode(currentNode, root2);
-    };
-    const _isValidAttribute = function _isValidAttribute2(lcTag, lcName, value) {
-      if (FORBID_ATTR[lcName])
-        return false;
-      if (_isPatchLinkageAttribute(lcName, lcTag))
-        return false;
-      if (SANITIZE_DOM && (lcName === "id" || lcName === "name") && (value in document2 || value in formElement))
-        return false;
-      const nameIsPermitted = ALLOWED_ATTR[lcName] || EXTRA_ELEMENT_HANDLING.attributeCheck instanceof Function && EXTRA_ELEMENT_HANDLING.attributeCheck(lcName, lcTag);
-      if (ALLOW_DATA_ATTR && regExpTest(DATA_ATTR$1, lcName))
-        return true;
-      if (ALLOW_ARIA_ATTR && regExpTest(ARIA_ATTR$1, lcName))
-        return true;
-      if (!nameIsPermitted)
-        return _isBasicCustomElement(lcTag) && _matchesNameCheck(CUSTOM_ELEMENT_HANDLING.tagNameCheck, lcTag) && _matchesNameCheck(CUSTOM_ELEMENT_HANDLING.attributeNameCheck, lcName, lcTag) || lcName === "is" && CUSTOM_ELEMENT_HANDLING.allowCustomizedBuiltInElements && _matchesNameCheck(CUSTOM_ELEMENT_HANDLING.tagNameCheck, value);
-      if (URI_SAFE_ATTRIBUTES[lcName])
-        return true;
-      if (regExpTest(IS_ALLOWED_URI$1, stringReplace(value, ATTR_WHITESPACE$1, "")))
-        return true;
-      if ((lcName === "src" || lcName === "xlink:href" || lcName === "href") && lcTag !== "script" && stringIndexOf(value, "data:") === 0 && DATA_URI_TAGS[lcTag])
-        return true;
-      if (ALLOW_UNKNOWN_PROTOCOLS && !regExpTest(IS_SCRIPT_OR_DATA$1, stringReplace(value, ATTR_WHITESPACE$1, "")))
-        return true;
-      return !value;
-    };
-    const RESERVED_CUSTOM_ELEMENT_NAMES = addToSet({}, [
-      "annotation-xml",
-      "color-profile",
-      "font-face",
-      "font-face-format",
-      "font-face-name",
-      "font-face-src",
-      "font-face-uri",
-      "missing-glyph"
-    ]);
-    const _isBasicCustomElement = function _isBasicCustomElement2(tagName) {
-      return !RESERVED_CUSTOM_ELEMENT_NAMES[stringToLowerCase(tagName)] && regExpTest(CUSTOM_ELEMENT$1, tagName);
-    };
-    const _applyTrustedTypesToAttribute = function _applyTrustedTypesToAttribute2(lcTag, lcName, namespaceURI, value) {
-      if (trustedTypesPolicy && typeof trustedTypes === "object" && typeof trustedTypes.getAttributeType === "function" && !namespaceURI)
-        switch (trustedTypes.getAttributeType(lcTag, lcName)) {
-          case "TrustedHTML":
-            return _createTrustedHTML(value);
-          case "TrustedScriptURL":
-            return _createTrustedScriptURL(value);
-        }
-      return value;
-    };
-    const _setAttributeValue = function _setAttributeValue2(currentNode, name, namespaceURI, value) {
-      try {
-        if (namespaceURI)
-          currentNode.setAttributeNS(namespaceURI, name, value);
-        else
-          currentNode.setAttribute(name, value);
-        if (_isClobbered(currentNode)) {
-          _forceRemove(currentNode);
-          return false;
-        }
-        return true;
-      } catch (_) {
-        _removeAttribute(name, currentNode);
-        return false;
-      }
-    };
-    const _sanitizeAttributes = function _sanitizeAttributes2(currentNode, root2) {
-      _executeHooks(hooks.beforeSanitizeAttributes, currentNode, null);
-      if (_handleHookDetachedNode(currentNode, root2))
-        return;
-      const attributes = currentNode.attributes;
-      if (!attributes || _isClobbered(currentNode))
-        return;
-      ALLOWED_ATTR = _forkSharedAllowlist(hooks.uponSanitizeAttribute, ALLOWED_ATTR, DEFAULT_ALLOWED_ATTR, SET_CONFIG_ALLOWED_ATTR);
-      const hookEvent = {
-        attrName: "",
-        attrValue: "",
-        keepAttr: true,
-        allowedAttributes: ALLOWED_ATTR,
-        forceKeepAttr: void 0
-      };
-      let l = attributes.length;
-      const lcTag = transformCaseFunc(currentNode.nodeName);
-      while (l--) {
-        const attr = attributes[l];
-        const name = attr.name, namespaceURI = attr.namespaceURI, attrValue = attr.value;
-        const lcName = transformCaseFunc(name);
-        const initValue = attrValue;
-        let value = name === "value" ? initValue : stringTrim(initValue);
-        let recreatedNamedProp = false;
-        hookEvent.attrName = lcName;
-        hookEvent.attrValue = value;
-        hookEvent.keepAttr = true;
-        hookEvent.forceKeepAttr = void 0;
-        _executeHooks(hooks.uponSanitizeAttribute, currentNode, hookEvent);
-        value = hookEvent.attrValue;
-        if (SANITIZE_NAMED_PROPS && (lcName === "id" || lcName === "name") && stringIndexOf(value, SANITIZE_NAMED_PROPS_PREFIX) !== 0) {
-          _removeAttribute(name, currentNode, attr);
-          value = SANITIZE_NAMED_PROPS_PREFIX + value;
-          recreatedNamedProp = true;
-        }
-        if (SAFE_FOR_XML && regExpTest(/((--!?|])>)|<\/(style|script|title|xmp|textarea|noscript|iframe|noembed|noframes)/i, value)) {
-          _removeAttribute(name, currentNode, attr);
-          continue;
-        }
-        if (lcName === "attributename" && stringMatch(value, "href")) {
-          _removeAttribute(name, currentNode, attr);
-          continue;
-        }
-        if (hookEvent.forceKeepAttr)
-          continue;
-        if (!hookEvent.keepAttr) {
-          _removeAttribute(name, currentNode, attr);
-          continue;
-        }
-        if (!ALLOW_SELF_CLOSE_IN_ATTR && regExpTest(SELF_CLOSING_TAG, value)) {
-          _removeAttribute(name, currentNode, attr);
-          continue;
-        }
-        if (SAFE_FOR_TEMPLATES)
-          value = _stripTemplateExpressions(value);
-        if (!_isValidAttribute(lcTag, lcName, value)) {
-          _removeAttribute(name, currentNode, attr);
-          continue;
-        }
-        value = _applyTrustedTypesToAttribute(lcTag, lcName, namespaceURI, value);
-        if (value !== initValue) {
-          if (_setAttributeValue(currentNode, name, namespaceURI, value) && recreatedNamedProp)
-            arrayPop(DOMPurify.removed);
-        }
-      }
-      _executeHooks(hooks.afterSanitizeAttributes, currentNode, null);
-      _handleHookDetachedNode(currentNode, root2);
-    };
-    const _sanitizeShadowDOM2 = function _sanitizeShadowDOM(fragment) {
-      let shadowNode = null;
-      const shadowIterator = _createNodeIterator(fragment);
-      _executeHooks(hooks.beforeSanitizeShadowDOM, fragment, null);
-      while (shadowNode = shadowIterator.nextNode()) {
-        _executeHooks(hooks.uponSanitizeShadowNode, shadowNode, null);
-        _sanitizeElements(shadowNode, fragment);
-        _sanitizeAttributes(shadowNode, fragment);
-        if (_isDocumentFragment(shadowNode.content))
-          _sanitizeShadowDOM2(shadowNode.content);
-        if (_readNodeType(shadowNode) === NODE_TYPE.element) {
-          const innerSr = getShadowRoot(shadowNode);
-          if (_isDocumentFragment(innerSr)) {
-            _sanitizeAttachedShadowRoots(innerSr);
-            _sanitizeShadowDOM2(innerSr);
-          }
-        }
-      }
-      _executeHooks(hooks.afterSanitizeShadowDOM, fragment, null);
-    };
-    const _sanitizeAttachedShadowRoots = function _sanitizeAttachedShadowRoots2(root2) {
-      const stack = [{
-        node: root2,
-        shadow: null
-      }];
-      while (stack.length > 0) {
-        const item = stack.pop();
-        if (item.shadow) {
-          _sanitizeShadowDOM2(item.shadow);
-          continue;
-        }
-        const node = item.node;
-        const isElement = _readNodeType(node) === NODE_TYPE.element;
-        const childNodes = getChildNodes(node);
-        if (childNodes)
-          for (let i = childNodes.length - 1; i >= 0; --i)
-            stack.push({
-              node: childNodes[i],
-              shadow: null
-            });
-        if (isElement) {
-          const rootName = getNodeName ? getNodeName(node) : null;
-          if (typeof rootName === "string" && transformCaseFunc(rootName) === "template") {
-            const content = node.content;
-            if (_isDocumentFragment(content))
-              stack.push({
-                node: content,
-                shadow: null
-              });
-          }
-        }
-        if (isElement) {
-          const sr = getShadowRoot(node);
-          if (_isDocumentFragment(sr))
-            stack.push({
-              node: null,
-              shadow: sr
-            }, {
-              node: sr,
-              shadow: null
-            });
-        }
-      }
-    };
-    DOMPurify.sanitize = function(dirty) {
-      let cfg = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
-      let body = null;
-      let importedNode = null;
-      let currentNode = null;
-      let returnNode = null;
-      IS_EMPTY_INPUT = !dirty;
-      if (IS_EMPTY_INPUT)
-        dirty = "<!-->";
-      if (typeof dirty !== "string" && !_isNode(dirty)) {
-        dirty = stringifyValue(dirty);
-        if (typeof dirty !== "string")
-          throw typeErrorCreate("dirty is not a string, aborting");
-      }
-      if (!DOMPurify.isSupported)
-        return dirty;
-      if (SET_CONFIG) {
-        ALLOWED_TAGS = SET_CONFIG_ALLOWED_TAGS;
-        ALLOWED_ATTR = SET_CONFIG_ALLOWED_ATTR;
-      } else
-        _parseConfig(cfg);
-      if (hooks.uponSanitizeElement.length > 0 || hooks.uponSanitizeAttribute.length > 0)
-        ALLOWED_TAGS = clone(ALLOWED_TAGS);
-      if (hooks.uponSanitizeAttribute.length > 0)
-        ALLOWED_ATTR = clone(ALLOWED_ATTR);
-      DOMPurify.removed = [];
-      const inPlace = IN_PLACE && typeof dirty !== "string" && _isNode(dirty);
-      if (inPlace) {
-        _neutralizePatchLinkage(dirty);
-        const nn = _readNodeName(dirty);
-        if (typeof nn === "string") {
-          const tagName = transformCaseFunc(nn);
-          if (!ALLOWED_TAGS[tagName] || FORBID_TAGS[tagName]) {
-            _neutralizeRoot(dirty);
-            throw typeErrorCreate("root node is forbidden and cannot be sanitized in-place");
-          }
-        }
-        if (_isClobbered(dirty)) {
-          _neutralizeRoot(dirty);
-          throw typeErrorCreate("root node is clobbered and cannot be sanitized in-place");
-        }
-        try {
-          _sanitizeAttachedShadowRoots(dirty);
-        } catch (error) {
-          _neutralizeRoot(dirty);
-          throw error;
-        }
-      } else if (_isNode(dirty)) {
-        body = _initDocument("<!---->");
-        importedNode = body.ownerDocument.importNode(dirty, true);
-        if (importedNode.nodeType === NODE_TYPE.element && importedNode.nodeName === "BODY")
-          body = importedNode;
-        else if (importedNode.nodeName === "HTML")
-          body = importedNode;
-        else
-          body.appendChild(importedNode);
-        _sanitizeAttachedShadowRoots(body);
-      } else {
-        if (!RETURN_DOM && !SAFE_FOR_TEMPLATES && !WHOLE_DOCUMENT && dirty.indexOf("<") === -1)
-          return trustedTypesPolicy && RETURN_TRUSTED_TYPE ? _createTrustedHTML(dirty) : dirty;
-        body = _initDocument(dirty);
-        if (!body)
-          return RETURN_DOM ? null : RETURN_TRUSTED_TYPE ? emptyHTML : "";
-      }
-      if (body && FORCE_BODY)
-        _forceRemove(body.firstChild);
-      const walkRoot = inPlace ? dirty : body;
-      try {
-        const nodeIterator = _createNodeIterator(walkRoot);
-        while (currentNode = nodeIterator.nextNode()) {
-          _sanitizeElements(currentNode, walkRoot);
-          _sanitizeAttributes(currentNode, walkRoot);
-          if (_isDocumentFragment(currentNode.content))
-            _sanitizeShadowDOM2(currentNode.content);
-        }
-      } catch (error) {
-        if (inPlace) {
-          _neutralizeRoot(dirty);
-          arrayForEach(DOMPurify.removed, (entry) => {
-            if (entry.element)
-              _neutralizeSubtree(entry.element);
-          });
-        }
-        throw error;
-      }
-      if (inPlace) {
-        let rootWasRemoved = false;
-        arrayForEach(DOMPurify.removed, (entry) => {
-          if (entry.element) {
-            if (entry.element === dirty)
-              rootWasRemoved = true;
-            _neutralizeSubtree(entry.element);
-          }
-        });
-        if (rootWasRemoved)
-          throw typeErrorCreate("a node selected for removal could not be safely returned; refusing to sanitize in place");
-        if (SAFE_FOR_TEMPLATES)
-          _scrubTemplateExpressions2(dirty);
-        return dirty;
-      }
-      if (RETURN_DOM) {
-        if (SAFE_FOR_TEMPLATES)
-          _scrubTemplateExpressions2(body);
-        if (RETURN_DOM_FRAGMENT) {
-          returnNode = createDocumentFragment.call(body.ownerDocument);
-          while (body.firstChild)
-            returnNode.appendChild(body.firstChild);
-        } else
-          returnNode = body;
-        if (ALLOWED_ATTR.shadowroot || ALLOWED_ATTR.shadowrootmode)
-          returnNode = importNode.call(originalDocument, returnNode, true);
-        return returnNode;
-      }
-      let serializedHTML = WHOLE_DOCUMENT ? body.outerHTML : body.innerHTML;
-      if (WHOLE_DOCUMENT && ALLOWED_TAGS["!doctype"] && body.ownerDocument && body.ownerDocument.doctype && body.ownerDocument.doctype.name && regExpTest(DOCTYPE_NAME, body.ownerDocument.doctype.name))
-        serializedHTML = "<!DOCTYPE " + body.ownerDocument.doctype.name + ">\n" + serializedHTML;
-      if (SAFE_FOR_TEMPLATES)
-        serializedHTML = _stripTemplateExpressions(serializedHTML);
-      return trustedTypesPolicy && RETURN_TRUSTED_TYPE ? _createTrustedHTML(serializedHTML) : serializedHTML;
-    };
-    DOMPurify.setConfig = function() {
-      let cfg = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {};
-      _parseConfig(cfg);
-      SET_CONFIG = true;
-      SET_CONFIG_ALLOWED_TAGS = ALLOWED_TAGS;
-      SET_CONFIG_ALLOWED_ATTR = ALLOWED_ATTR;
-    };
-    DOMPurify.clearConfig = function() {
-      CONFIG = null;
-      SET_CONFIG = false;
-      SET_CONFIG_ALLOWED_TAGS = null;
-      SET_CONFIG_ALLOWED_ATTR = null;
-      trustedTypesPolicy = defaultTrustedTypesPolicy;
-      emptyHTML = "";
-    };
-    DOMPurify.isValidAttribute = function(tag, attr, value) {
-      if (!CONFIG)
-        _parseConfig({});
-      const lcTag = transformCaseFunc(tag);
-      const lcName = transformCaseFunc(attr);
-      return _isValidAttribute(lcTag, lcName, value);
-    };
-    DOMPurify.addHook = function(entryPoint, hookFunction) {
-      if (typeof hookFunction !== "function")
-        return;
-      if (!objectHasOwnProperty(hooks, entryPoint))
-        return;
-      arrayPush(hooks[entryPoint], hookFunction);
-    };
-    DOMPurify.removeHook = function(entryPoint, hookFunction) {
-      if (!objectHasOwnProperty(hooks, entryPoint))
-        return;
-      if (hookFunction !== void 0) {
-        const index = arrayLastIndexOf(hooks[entryPoint], hookFunction);
-        return index === -1 ? void 0 : arraySplice(hooks[entryPoint], index, 1)[0];
-      }
-      return arrayPop(hooks[entryPoint]);
-    };
-    DOMPurify.removeHooks = function(entryPoint) {
-      if (!objectHasOwnProperty(hooks, entryPoint))
-        return;
-      hooks[entryPoint] = [];
-    };
-    DOMPurify.removeAllHooks = function() {
-      hooks = _createHooksMap();
-    };
-    return DOMPurify;
-  }
-  var purify_default = createDOMPurify();
-  purify_default.addHook("afterSanitizeAttributes", (node) => {
-    if (node.tagName === "A") {
-      node.setAttribute("target", "_blank");
-      node.setAttribute("rel", "noopener noreferrer");
-    }
-  });
-  function markdown(md) {
-    return purify_default.sanitize(marked.parse(md), { ADD_ATTR: ["target"] });
-  }
-  const debug$1 = typeof process === "object" && process.env && {}.NODE_DEBUG && /\bsemver\b/i.test({}.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
-  };
-  var debug_1 = debug$1;
-  const SEMVER_SPEC_VERSION = "2.0.0";
-  const MAX_LENGTH$1 = 256;
-  const MAX_SAFE_INTEGER$1 = Number.MAX_SAFE_INTEGER || 9007199254740991;
-  const MAX_SAFE_COMPONENT_LENGTH = 16;
-  const MAX_SAFE_BUILD_LENGTH = MAX_LENGTH$1 - 6;
-  const RELEASE_TYPES = [
-    "major",
-    "premajor",
-    "minor",
-    "preminor",
-    "patch",
-    "prepatch",
-    "prerelease"
-  ];
-  var constants = {
-    MAX_LENGTH: MAX_LENGTH$1,
-    MAX_SAFE_COMPONENT_LENGTH,
-    MAX_SAFE_BUILD_LENGTH,
-    MAX_SAFE_INTEGER: MAX_SAFE_INTEGER$1,
-    RELEASE_TYPES,
-    SEMVER_SPEC_VERSION,
-    FLAG_INCLUDE_PRERELEASE: 1,
-    FLAG_LOOSE: 2
-  };
-  var re$1 = { exports: {} };
-  (function(module2, exports3) {
-    const {
-      MAX_SAFE_COMPONENT_LENGTH: MAX_SAFE_COMPONENT_LENGTH2,
-      MAX_SAFE_BUILD_LENGTH: MAX_SAFE_BUILD_LENGTH2,
-      MAX_LENGTH: MAX_LENGTH2
-    } = constants;
-    const debug2 = debug_1;
-    exports3 = module2.exports = {};
-    const re2 = exports3.re = [];
-    const safeRe = exports3.safeRe = [];
-    const src2 = exports3.src = [];
-    const safeSrc = exports3.safeSrc = [];
-    const t2 = exports3.t = {};
-    let R2 = 0;
-    const LETTERDASHNUMBER = "[a-zA-Z0-9-]";
-    const safeRegexReplacements = [
-      ["\\s", 1],
-      ["\\d", MAX_LENGTH2],
-      [LETTERDASHNUMBER, MAX_SAFE_BUILD_LENGTH2]
-    ];
-    const makeSafeRegex = (value) => {
-      for (const [token, max] of safeRegexReplacements) {
-        value = value.split(`${token}*`).join(`${token}{0,${max}}`).split(`${token}+`).join(`${token}{1,${max}}`);
-      }
-      return value;
-    };
-    const createToken = (name, value, isGlobal) => {
-      const safe = makeSafeRegex(value);
-      const index = R2++;
-      debug2(name, index, value);
-      t2[name] = index;
-      src2[index] = value;
-      safeSrc[index] = safe;
-      re2[index] = new RegExp(value, isGlobal ? "g" : void 0);
-      safeRe[index] = new RegExp(safe, isGlobal ? "g" : void 0);
-    };
-    createToken("NUMERICIDENTIFIER", "0|[1-9]\\d*");
-    createToken("NUMERICIDENTIFIERLOOSE", "\\d+");
-    createToken("NONNUMERICIDENTIFIER", `\\d*[a-zA-Z-]${LETTERDASHNUMBER}*`);
-    createToken("MAINVERSION", `(${src2[t2.NUMERICIDENTIFIER]})\\.(${src2[t2.NUMERICIDENTIFIER]})\\.(${src2[t2.NUMERICIDENTIFIER]})`);
-    createToken("MAINVERSIONLOOSE", `(${src2[t2.NUMERICIDENTIFIERLOOSE]})\\.(${src2[t2.NUMERICIDENTIFIERLOOSE]})\\.(${src2[t2.NUMERICIDENTIFIERLOOSE]})`);
-    createToken("PRERELEASEIDENTIFIER", `(?:${src2[t2.NONNUMERICIDENTIFIER]}|${src2[t2.NUMERICIDENTIFIER]})`);
-    createToken("PRERELEASEIDENTIFIERLOOSE", `(?:${src2[t2.NONNUMERICIDENTIFIER]}|${src2[t2.NUMERICIDENTIFIERLOOSE]})`);
-    createToken("PRERELEASE", `(?:-(${src2[t2.PRERELEASEIDENTIFIER]}(?:\\.${src2[t2.PRERELEASEIDENTIFIER]})*))`);
-    createToken("PRERELEASELOOSE", `(?:-?(${src2[t2.PRERELEASEIDENTIFIERLOOSE]}(?:\\.${src2[t2.PRERELEASEIDENTIFIERLOOSE]})*))`);
-    createToken("BUILDIDENTIFIER", `${LETTERDASHNUMBER}+`);
-    createToken("BUILD", `(?:\\+(${src2[t2.BUILDIDENTIFIER]}(?:\\.${src2[t2.BUILDIDENTIFIER]})*))`);
-    createToken("FULLPLAIN", `v?${src2[t2.MAINVERSION]}${src2[t2.PRERELEASE]}?${src2[t2.BUILD]}?`);
-    createToken("FULL", `^${src2[t2.FULLPLAIN]}$`);
-    createToken("LOOSEPLAIN", `[v=\\s]*${src2[t2.MAINVERSIONLOOSE]}${src2[t2.PRERELEASELOOSE]}?${src2[t2.BUILD]}?`);
-    createToken("LOOSE", `^${src2[t2.LOOSEPLAIN]}$`);
-    createToken("GTLT", "((?:<|>)?=?)");
-    createToken("XRANGEIDENTIFIERLOOSE", `${src2[t2.NUMERICIDENTIFIERLOOSE]}|x|X|\\*`);
-    createToken("XRANGEIDENTIFIER", `${src2[t2.NUMERICIDENTIFIER]}|x|X|\\*`);
-    createToken("XRANGEPLAIN", `[v=\\s]*(${src2[t2.XRANGEIDENTIFIER]})(?:\\.(${src2[t2.XRANGEIDENTIFIER]})(?:\\.(${src2[t2.XRANGEIDENTIFIER]})(?:${src2[t2.PRERELEASE]})?${src2[t2.BUILD]}?)?)?`);
-    createToken("XRANGEPLAINLOOSE", `[v=\\s]*(${src2[t2.XRANGEIDENTIFIERLOOSE]})(?:\\.(${src2[t2.XRANGEIDENTIFIERLOOSE]})(?:\\.(${src2[t2.XRANGEIDENTIFIERLOOSE]})(?:${src2[t2.PRERELEASELOOSE]})?${src2[t2.BUILD]}?)?)?`);
-    createToken("XRANGE", `^${src2[t2.GTLT]}\\s*${src2[t2.XRANGEPLAIN]}$`);
-    createToken("XRANGELOOSE", `^${src2[t2.GTLT]}\\s*${src2[t2.XRANGEPLAINLOOSE]}$`);
-    createToken("COERCEPLAIN", `${"(^|[^\\d])(\\d{1,"}${MAX_SAFE_COMPONENT_LENGTH2}})(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH2}}))?(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH2}}))?`);
-    createToken("COERCE", `${src2[t2.COERCEPLAIN]}(?:$|[^\\d])`);
-    createToken("COERCEFULL", src2[t2.COERCEPLAIN] + `(?:${src2[t2.PRERELEASE]})?(?:${src2[t2.BUILD]})?(?:$|[^\\d])`);
-    createToken("COERCERTL", src2[t2.COERCE], true);
-    createToken("COERCERTLFULL", src2[t2.COERCEFULL], true);
-    createToken("LONETILDE", "(?:~>?)");
-    createToken("TILDETRIM", `(\\s*)${src2[t2.LONETILDE]}\\s+`, true);
-    exports3.tildeTrimReplace = "$1~";
-    createToken("TILDE", `^${src2[t2.LONETILDE]}${src2[t2.XRANGEPLAIN]}$`);
-    createToken("TILDELOOSE", `^${src2[t2.LONETILDE]}${src2[t2.XRANGEPLAINLOOSE]}$`);
-    createToken("LONECARET", "(?:\\^)");
-    createToken("CARETTRIM", `(\\s*)${src2[t2.LONECARET]}\\s+`, true);
-    exports3.caretTrimReplace = "$1^";
-    createToken("CARET", `^${src2[t2.LONECARET]}${src2[t2.XRANGEPLAIN]}$`);
-    createToken("CARETLOOSE", `^${src2[t2.LONECARET]}${src2[t2.XRANGEPLAINLOOSE]}$`);
-    createToken("COMPARATORLOOSE", `^${src2[t2.GTLT]}\\s*(${src2[t2.LOOSEPLAIN]})$|^$`);
-    createToken("COMPARATOR", `^${src2[t2.GTLT]}\\s*(${src2[t2.FULLPLAIN]})$|^$`);
-    createToken("COMPARATORTRIM", `(\\s*)${src2[t2.GTLT]}\\s*(${src2[t2.LOOSEPLAIN]}|${src2[t2.XRANGEPLAIN]})`, true);
-    exports3.comparatorTrimReplace = "$1$2$3";
-    createToken("HYPHENRANGE", `^\\s*(${src2[t2.XRANGEPLAIN]})\\s+-\\s+(${src2[t2.XRANGEPLAIN]})\\s*$`);
-    createToken("HYPHENRANGELOOSE", `^\\s*(${src2[t2.XRANGEPLAINLOOSE]})\\s+-\\s+(${src2[t2.XRANGEPLAINLOOSE]})\\s*$`);
-    createToken("STAR", "(<|>)?=?\\s*\\*");
-    createToken("GTE0", "^\\s*>=\\s*0\\.0\\.0\\s*$");
-    createToken("GTE0PRE", "^\\s*>=\\s*0\\.0\\.0-0\\s*$");
-  })(re$1, re$1.exports);
-  const looseOption = Object.freeze({ loose: true });
-  const emptyOpts = Object.freeze({});
-  const parseOptions$1 = (options) => {
-    if (!options) {
-      return emptyOpts;
-    }
-    if (typeof options !== "object") {
-      return looseOption;
-    }
-    return options;
-  };
-  var parseOptions_1 = parseOptions$1;
-  const numeric = /^[0-9]+$/;
-  const compareIdentifiers$1 = (a, b) => {
-    if (typeof a === "number" && typeof b === "number") {
-      return a === b ? 0 : a < b ? -1 : 1;
-    }
-    const anum = numeric.test(a);
-    const bnum = numeric.test(b);
-    if (anum && bnum) {
-      a = +a;
-      b = +b;
-    }
-    return a === b ? 0 : anum && !bnum ? -1 : bnum && !anum ? 1 : a < b ? -1 : 1;
-  };
-  const rcompareIdentifiers = (a, b) => compareIdentifiers$1(b, a);
-  var identifiers = {
-    compareIdentifiers: compareIdentifiers$1,
-    rcompareIdentifiers
-  };
-  const debug = debug_1;
-  const { MAX_LENGTH, MAX_SAFE_INTEGER } = constants;
-  const { safeRe: re, t } = re$1.exports;
-  const parseOptions = parseOptions_1;
-  const { compareIdentifiers } = identifiers;
-  class SemVer$2 {
-    constructor(version, options) {
-      options = parseOptions(options);
-      if (version instanceof SemVer$2) {
-        if (version.loose === !!options.loose && version.includePrerelease === !!options.includePrerelease) {
-          return version;
-        } else {
-          version = version.version;
-        }
-      } else if (typeof version !== "string") {
-        throw new TypeError(`Invalid version. Must be a string. Got type "${typeof version}".`);
-      }
-      if (version.length > MAX_LENGTH) {
-        throw new TypeError(
-          `version is longer than ${MAX_LENGTH} characters`
-        );
-      }
-      debug("SemVer", version, options);
-      this.options = options;
-      this.loose = !!options.loose;
-      this.includePrerelease = !!options.includePrerelease;
-      const m = version.trim().match(options.loose ? re[t.LOOSE] : re[t.FULL]);
-      if (!m) {
-        throw new TypeError(`Invalid Version: ${version}`);
-      }
-      this.raw = version;
-      this.major = +m[1];
-      this.minor = +m[2];
-      this.patch = +m[3];
-      if (this.major > MAX_SAFE_INTEGER || this.major < 0) {
-        throw new TypeError("Invalid major version");
-      }
-      if (this.minor > MAX_SAFE_INTEGER || this.minor < 0) {
-        throw new TypeError("Invalid minor version");
-      }
-      if (this.patch > MAX_SAFE_INTEGER || this.patch < 0) {
-        throw new TypeError("Invalid patch version");
-      }
-      if (!m[4]) {
-        this.prerelease = [];
-      } else {
-        this.prerelease = m[4].split(".").map((id) => {
-          if (/^[0-9]+$/.test(id)) {
-            const num = +id;
-            if (num >= 0 && num < MAX_SAFE_INTEGER) {
-              return num;
-            }
-          }
-          return id;
-        });
-      }
-      this.build = m[5] ? m[5].split(".") : [];
-      this.format();
-    }
-    format() {
-      this.version = `${this.major}.${this.minor}.${this.patch}`;
-      if (this.prerelease.length) {
-        this.version += `-${this.prerelease.join(".")}`;
-      }
-      return this.version;
-    }
-    toString() {
-      return this.version;
-    }
-    compare(other) {
-      debug("SemVer.compare", this.version, this.options, other);
-      if (!(other instanceof SemVer$2)) {
-        if (typeof other === "string" && other === this.version) {
-          return 0;
-        }
-        other = new SemVer$2(other, this.options);
-      }
-      if (other.version === this.version) {
-        return 0;
-      }
-      return this.compareMain(other) || this.comparePre(other);
-    }
-    compareMain(other) {
-      if (!(other instanceof SemVer$2)) {
-        other = new SemVer$2(other, this.options);
-      }
-      if (this.major < other.major) {
-        return -1;
-      }
-      if (this.major > other.major) {
-        return 1;
-      }
-      if (this.minor < other.minor) {
-        return -1;
-      }
-      if (this.minor > other.minor) {
-        return 1;
-      }
-      if (this.patch < other.patch) {
-        return -1;
-      }
-      if (this.patch > other.patch) {
-        return 1;
-      }
-      return 0;
-    }
-    comparePre(other) {
-      if (!(other instanceof SemVer$2)) {
-        other = new SemVer$2(other, this.options);
-      }
-      if (this.prerelease.length && !other.prerelease.length) {
-        return -1;
-      } else if (!this.prerelease.length && other.prerelease.length) {
-        return 1;
-      } else if (!this.prerelease.length && !other.prerelease.length) {
-        return 0;
-      }
-      let i = 0;
-      do {
-        const a = this.prerelease[i];
-        const b = other.prerelease[i];
-        debug("prerelease compare", i, a, b);
-        if (a === void 0 && b === void 0) {
-          return 0;
-        } else if (b === void 0) {
-          return 1;
-        } else if (a === void 0) {
-          return -1;
-        } else if (a === b) {
-          continue;
-        } else {
-          return compareIdentifiers(a, b);
-        }
-      } while (++i);
-    }
-    compareBuild(other) {
-      if (!(other instanceof SemVer$2)) {
-        other = new SemVer$2(other, this.options);
-      }
-      let i = 0;
-      do {
-        const a = this.build[i];
-        const b = other.build[i];
-        debug("build compare", i, a, b);
-        if (a === void 0 && b === void 0) {
-          return 0;
-        } else if (b === void 0) {
-          return 1;
-        } else if (a === void 0) {
-          return -1;
-        } else if (a === b) {
-          continue;
-        } else {
-          return compareIdentifiers(a, b);
-        }
-      } while (++i);
-    }
-    inc(release, identifier, identifierBase) {
-      if (release.startsWith("pre")) {
-        if (!identifier && identifierBase === false) {
-          throw new Error("invalid increment argument: identifier is empty");
-        }
-        if (identifier) {
-          const match = `-${identifier}`.match(this.options.loose ? re[t.PRERELEASELOOSE] : re[t.PRERELEASE]);
-          if (!match || match[1] !== identifier) {
-            throw new Error(`invalid identifier: ${identifier}`);
-          }
-        }
-      }
-      switch (release) {
-        case "premajor":
-          this.prerelease.length = 0;
-          this.patch = 0;
-          this.minor = 0;
-          this.major++;
-          this.inc("pre", identifier, identifierBase);
-          break;
-        case "preminor":
-          this.prerelease.length = 0;
-          this.patch = 0;
-          this.minor++;
-          this.inc("pre", identifier, identifierBase);
-          break;
-        case "prepatch":
-          this.prerelease.length = 0;
-          this.inc("patch", identifier, identifierBase);
-          this.inc("pre", identifier, identifierBase);
-          break;
-        case "prerelease":
-          if (this.prerelease.length === 0) {
-            this.inc("patch", identifier, identifierBase);
-          }
-          this.inc("pre", identifier, identifierBase);
-          break;
-        case "release":
-          if (this.prerelease.length === 0) {
-            throw new Error(`version ${this.raw} is not a prerelease`);
-          }
-          this.prerelease.length = 0;
-          break;
-        case "major":
-          if (this.minor !== 0 || this.patch !== 0 || this.prerelease.length === 0) {
-            this.major++;
-          }
-          this.minor = 0;
-          this.patch = 0;
-          this.prerelease = [];
-          break;
-        case "minor":
-          if (this.patch !== 0 || this.prerelease.length === 0) {
-            this.minor++;
-          }
-          this.patch = 0;
-          this.prerelease = [];
-          break;
-        case "patch":
-          if (this.prerelease.length === 0) {
-            this.patch++;
-          }
-          this.prerelease = [];
-          break;
-        case "pre": {
-          const base = Number(identifierBase) ? 1 : 0;
-          if (this.prerelease.length === 0) {
-            this.prerelease = [base];
-          } else {
-            let i = this.prerelease.length;
-            while (--i >= 0) {
-              if (typeof this.prerelease[i] === "number") {
-                this.prerelease[i]++;
-                i = -2;
-              }
-            }
-            if (i === -1) {
-              if (identifier === this.prerelease.join(".") && identifierBase === false) {
-                throw new Error("invalid increment argument: identifier already exists");
-              }
-              this.prerelease.push(base);
-            }
-          }
-          if (identifier) {
-            let prerelease = [identifier, base];
-            if (identifierBase === false) {
-              prerelease = [identifier];
-            }
-            if (compareIdentifiers(this.prerelease[0], identifier) === 0) {
-              if (isNaN(this.prerelease[1])) {
-                this.prerelease = prerelease;
-              }
-            } else {
-              this.prerelease = prerelease;
-            }
-          }
-          break;
-        }
-        default:
-          throw new Error(`invalid increment argument: ${release}`);
-      }
-      this.raw = this.format();
-      if (this.build.length) {
-        this.raw += `+${this.build.join(".")}`;
-      }
-      return this;
-    }
-  }
-  var semver = SemVer$2;
-  const SemVer$1 = semver;
-  const compare$1 = (a, b, loose) => new SemVer$1(a, loose).compare(new SemVer$1(b, loose));
-  var compare_1 = compare$1;
-  const compare = compare_1;
-  const gt = (a, b, loose) => compare(a, b, loose) > 0;
-  var gt_1 = gt;
-  const SemVer = semver;
-  const parse$1 = (version, options, throwErrors = false) => {
-    if (version instanceof SemVer) {
-      return version;
-    }
-    try {
-      return new SemVer(version, options);
-    } catch (er) {
-      if (!throwErrors) {
-        return null;
-      }
-      throw er;
-    }
-  };
-  var parse_1 = parse$1;
-  const parse = parse_1;
-  const valid = (version, options) => {
-    const v = parse(version, options);
-    return v ? v.version : null;
-  };
-  var valid_1 = valid;
   const RenderScript = lib.createRenderScript({
     name: "🖼️ 窗口设置"
   });
@@ -9510,7 +4912,7 @@ ${content}</tr>
     error: (attrs) => msg("error", attrs),
     success: (attrs) => msg("success", attrs)
   };
-  const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 1080 1080" style="vertical-align:middle;"><path fill-rule="evenodd" d="M504.5 1.109c-72.713 4.577-147.529 25.339-212.035 58.842-50.191 26.068-92.985 57.474-133.527 97.996-41.255 41.234-72.652 84.102-98.549 134.553-63.294 123.306-76.989 265.444-38.445 399 25.189 87.279 71.847 166.103 136.667 230.88 51 50.967 110.694 90.846 176.835 118.135 49.129 20.27 108.457 34.223 163.504 38.452 17.303 1.329 66.996 1.333 83.655.006 55.204-4.397 107.295-16.401 158.822-36.6 17.371-6.81 57.946-26.767 74.073-36.433 41.445-24.842 72.509-49.199 110.493-86.637l21.507-21.198-71.734-71.786-71.734-71.785-19.766 19.567c-10.871 10.762-23.591 22.705-28.266 26.54-53.604 43.971-115.935 69.551-185 75.921-81.757 7.541-165.599-15.992-231.454-64.964-6.35-4.722-11.546-8.93-11.546-9.349s11.385-12.142 25.3-26.049l25.3-25.286 4.777-3.648c13.463 10.28 36.952 23.436 55.855 31.285 52.351 21.738 113.089 25.925 168.768 11.634 35.263-9.05 73.276-28.363 100.754-51.188C722.543 734.838 751 705.231 751 702.338c0-1.002-47.194-48.338-48.193-48.338-.39 0-4.279 4.388-8.642 9.75-24.686 30.342-55.543 51.652-92.165 63.652-22.77 7.461-33.447 9.027-61.5 9.025-20.917-.002-25.46-.293-35.363-2.266-31.598-6.297-58.925-18.374-83.801-37.035-4.858-3.644-16.847-14.474-26.642-24.066l-17.809-17.44-73.994 73.94-73.994 73.94 21.324 21c28.787 28.349 48.737 44.364 77.279 62.033 15.029 9.303 48.315 26.086 63 31.763 35.072 13.559 69.772 21.993 108 26.249 20.372 2.268 63.437 2.268 84-.001 76.772-8.471 146.44-36.203 205.832-81.934 6.508-5.01 12.471-9.558 13.252-10.106 1.101-.773 6.563 4.151 24.406 22l22.988 22.996-10.739 8.675c-65.679 53.053-141.564 86.866-223.817 99.729-27.363 4.279-43.823 5.505-73.922 5.505-46.468 0-83.994-5.037-127.455-17.107C272.797 955.351 156.557 850.805 102.504 715c-22.28-55.977-32.803-111.402-32.94-173.5-.116-52.401 7.047-99.278 22.432-146.793C147.295 223.918 294.816 99.581 473 73.582c41.922-6.117 98.943-5.919 138.5.481 72.78 11.775 134.913 36.126 194.048 76.05C823.221 162.046 848 181.418 848 183.304c0 .661-32.624 33.823-72.498 73.694-55.881 55.877-72.815 72.265-73.88 71.498-41.919-30.237-86.474-47.748-133.478-52.458-13.265-1.329-41.947-1.334-55.288-.01-78.286 7.774-150.572 51.845-194.318 118.472-31.523 48.011-46.706 105.616-42.723 162.094 1.179 16.71 3.688 33.737 6.74 45.73C287.22 620.654 297.35 649 299.235 649c.53 0 12.635-11.675 26.9-25.945l25.936-25.944-1.984-7.806c-4.264-16.777-5.55-28.045-5.569-48.805-.019-21.105.931-29.802 5.136-47 13.445-54.989 48.145-99.893 98.346-127.264 16.503-8.998 39.898-16.833 60.379-20.222 15.558-2.575 45.897-2.791 61.002-.436C638.18 356.306 694.057 399.38 721.704 463c15.443 35.539 19.804 79.228 11.676 117-1.36 6.325-2.706 12.85-2.989 14.5-.482 2.81 1.166 4.677 25.998 29.444 25.179 25.113 26.56 26.321 27.443 24 .512-1.344 2.056-5.144 3.432-8.444 22.118-53.055 24.905-120.158 7.36-177.223-8.309-27.026-22.775-56.32-38.077-77.106-2.501-3.397-4.547-6.512-4.547-6.922s43.893-44.64 97.54-98.289l97.539-97.543-23.289-22.984c-24.441-24.12-39.625-37.373-61.265-53.476C760.232 29.842 634.23-7.058 504.5 1.109m453.75 253.895C944.913 268.521 934 279.798 934 280.065s4.308 7.673 9.574 16.46c22.263 37.147 39.526 77.171 50.801 117.778 3.005 10.825 4.205 15.733 7.623 31.197 10.804 48.879 12.225 117.979 3.485 169.5-11.438 67.422-31.332 118.888-70.557 182.535l-1.87 3.036 24.863 24.848 24.863 24.848 7.942-11.884c45.969-68.783 75.805-150.569 85.686-234.883 5.282-45.065 4.544-97.517-2.004-142.5-11.025-75.743-37.133-146.086-78.498-211.5-4.87-7.7-9.878-15.141-11.131-16.536l-2.277-2.536z"/></svg>`;
+  const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 64 64" style="vertical-align:middle;"><rect width="64" height="64" rx="14" fill="#1677ff"/><text x="32" y="42" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#fff" text-anchor="middle">OOC</text></svg>`;
   const loadingSpinSvg = `<svg class="aw-spin" width="14" height="14" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="28" stroke-dashoffset="10" stroke-linecap="round"/></svg>`;
   function createAccordionCard(options) {
     var _a;
@@ -9528,93 +4930,12 @@ ${content}</tr>
     return card;
   }
   const CHEVRON_SVG = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  async function probeAnswerer(item, disabled) {
-    if (disabled) {
-      return { status: "disabled" };
-    }
-    let probeUrl;
-    try {
-      probeUrl = new URL(item.url);
-    } catch {
-      return { status: "invalid" };
-    }
-    const t2 = Date.now();
-    probeUrl.searchParams.set("t", String(t2));
-    const doProbe = async (method) => {
-      const res = await request(probeUrl.toString(), {
-        type: "GM_xmlhttpRequest",
-        method,
-        responseType: "text",
-        anyStatus: true
-      });
-      if (method === "head" && (res.status === 405 || res.status === 501)) {
-        return doProbe("get");
-      }
-      return res;
-    };
-    try {
-      const res = await Promise.race([
-        doProbe("head"),
-        (async () => {
-          await $.sleep(10 * 1e3);
-          return void 0;
-        })()
-      ]);
-      if (res === void 0)
-        return { status: "timeout" };
-      const latency = Date.now() - t2;
-      const ok = res.status >= 200 && res.status < 400;
-      return ok ? { status: "success", statusCode: res.status, latency } : { status: "error", statusCode: res.status, latency, error: new Error("HTTP " + res.status) };
-    } catch (error) {
-      return { status: "error", error };
-    }
-  }
-  function formatProbeStatus(r) {
-    switch (r.status) {
-      case "success":
-        return `连接成功（${r.statusCode}）`;
-      case "error":
-        return r.statusCode !== void 0 ? `连接失败（${r.statusCode}）` : "连接失败";
-      case "timeout":
-        return "连接超时";
-      case "disabled":
-        return "已停用";
-      case "invalid":
-        return "配置错误";
-    }
-  }
-  function formatProbeLatency(r) {
-    return r.latency !== void 0 ? `延迟 ${r.latency}毫秒` : void 0;
-  }
   function createAnswererWrapperList(aw, handlers) {
-    const canProbe = lib.$gm.isInGMContext();
     const row = (label, value) => lib.h("li", { className: "aw-card-row" }, [
       lib.h("span", { className: "aw-card-label" }, label),
       lib.h("span", { className: "aw-card-value" }, [value])
     ]);
     return aw.map((item) => {
-      const statusEl = canProbe ? lib.h("span", { className: "aw-card-status-group" }, [
-        lib.h("span", { className: "aw-card-status probing" }, "检测中…")
-      ]) : void 0;
-      const renderStatus = (r) => {
-        var _a;
-        if (!statusEl)
-          return;
-        const latencyText = formatProbeLatency(r);
-        statusEl.replaceChildren(
-          lib.h("span", { className: "aw-card-status " + r.status }, formatProbeStatus(r)),
-          ...latencyText ? [lib.h("span", { className: "aw-card-status latency" }, latencyText)] : []
-        );
-        statusEl.title = r.status === "success" ? `连接成功，HTTP ${r.statusCode}，延迟 ${r.latency}毫秒` : r.status === "disabled" ? "此题库已被停用，点击右侧开关启用" : r.status === "error" ? "连接失败" + (((_a = r.error) == null ? void 0 : _a.message) ? `：${r.error.message}` : "") : r.status === "timeout" ? "连接超时（>10秒）" : "题库配置 URL 无法解析";
-      };
-      const startProbe = () => {
-        if (!statusEl)
-          return;
-        statusEl.replaceChildren(lib.h("span", { className: "aw-card-status probing" }, "检测中…"));
-        statusEl.title = "正在检测题库连接状态";
-        probeAnswerer(item, handlers.isDisabled(item.name)).then(renderStatus);
-      };
-      startProbe();
       const checkbox = lib.h("input", {
         type: "checkbox",
         checked: !handlers.isDisabled(item.name),
@@ -9627,11 +4948,6 @@ ${content}</tr>
         const disabled = !checkbox.checked;
         card.classList.toggle("disabled", disabled);
         handlers.onToggle(item.name, disabled);
-        if (disabled) {
-          renderStatus({ status: "disabled" });
-        } else {
-          startProbe();
-        }
       };
       const host = (() => {
         try {
@@ -9657,8 +4973,7 @@ ${content}</tr>
         header: [
           homeLink,
           lib.h("span", { className: "aw-card-name" }, item.name),
-          lib.h("span", { className: "aw-card-badge", title: item.url }, host),
-          ...statusEl ? [statusEl] : []
+          lib.h("span", { className: "aw-card-badge", title: item.url }, host)
         ],
         headerTrailing: [switchWrapper],
         body: [
@@ -9752,8 +5067,8 @@ ${content}</tr>
   }
   function createSteps(items) {
     const children = [];
-    items.forEach((text2, i) => {
-      children.push(lib.h("span", { className: "aw-step" }, [lib.h("span", { className: "aw-step-num" }, String(i + 1)), text2]));
+    items.forEach((text, i) => {
+      children.push(lib.h("span", { className: "aw-step" }, [lib.h("span", { className: "aw-step-num" }, String(i + 1)), text]));
       if (i < items.length - 1) {
         children.push(lib.h("span", { className: "aw-step-arrow" }, "→"));
       }
@@ -9762,8 +5077,8 @@ ${content}</tr>
   }
   function createStatusBox() {
     const el = lib.h("div", { className: "aw-connect-status" });
-    const setStatus = (text2, type) => {
-      el.innerHTML = text2;
+    const setStatus = (text, type) => {
+      el.innerHTML = text;
       el.className = "aw-connect-status " + type;
     };
     return { el, setStatus };
@@ -9778,7 +5093,7 @@ ${content}</tr>
   }
   const IMG_LINK_RE = /https?:\/\/[^"'<\s一-鿿]+?\.(?:png|jpe?g|gif|bmp|webp|svg)(?:\?[^\s"'<>一-鿿]*)?(?:#[^\s"'<>一-鿿]*)?/g;
   const transformImgLinkOfQuestion = (question) => {
-    const toImg = (text2) => text2.replace(IMG_LINK_RE, (img) => `<img src="${img}" />`);
+    const toImg = (text) => text.replace(IMG_LINK_RE, (img) => `<img src="${img}" />`);
     if (!/<img[\s>]/i.test(question)) {
       return toImg(question);
     }
@@ -10356,135 +5671,6 @@ ${content}</tr>
           }
         }
       }),
-      update: new lib.Script({
-        name: "📥 更新模块",
-        matches: [["所有页面", /.*/]],
-        namespace: "background.update",
-        configs: {
-          notes: {
-            defaultValue: "脚本自动更新模块，如果有新的版本会自动通知。"
-          },
-          autoNotify: {
-            defaultValue: true,
-            label: "开启更新通知",
-            attrs: { type: "checkbox", title: "当有最新的版本时自动弹窗通知，默认开启" }
-          },
-          notToday: {
-            defaultValue: -1
-          },
-          ignoreVersions: {
-            defaultValue: []
-          }
-        },
-        methods() {
-          return {
-            getLastVersion: async () => {
-              return await request("https://cdn.ocsjs.com/ocs-version.json?t=" + Date.now(), {
-                method: "get",
-                type: "GM_xmlhttpRequest"
-              });
-            },
-            showChangelog: async () => {
-              const changelog = lib.h("div", {
-                className: "markdown card",
-                innerHTML: "加载中...",
-                style: { maxWidth: "600px" }
-              });
-              lib.$modal.simple({
-                width: 600,
-                content: lib.h("div", [
-                  lib.h("div", { className: "notes card" }, [
-                    lib.$ui.notes(["此页面实时更新，遇到问题可以查看最新版本是否修复。"])
-                  ]),
-                  changelog
-                ])
-              });
-              const md = await request("https://cdn.ocsjs.com/articles/ocs/changelog.md?t=" + Date.now(), {
-                type: "GM_xmlhttpRequest",
-                responseType: "text",
-                method: "get"
-              });
-              changelog.innerHTML = markdown(md);
-            }
-          };
-        },
-        async onrender({ panel }) {
-          var _a;
-          const version = await this.methods.getLastVersion();
-          const infos = lib.$gm.getInfos();
-          if (!infos) {
-            return;
-          }
-          const changeLog = lib.h("button", { className: "base-style-button-secondary" }, "📄查看更新日志");
-          changeLog.onclick = () => this.methods.showChangelog();
-          const updatePage = ((_a = this.startConfig) == null ? void 0 : _a.updatePage) || "";
-          panel.body.replaceChildren(
-            lib.h("div", { className: "card" }, [
-              lib.h("hr"),
-              lib.h("div", ["最新版本：" + version["last-version"] + " - ", changeLog]),
-              lib.h("hr"),
-              lib.h("div", "当前版本：" + infos.script.version),
-              lib.h("div", "脚本管理器：" + infos.scriptHandler),
-              lib.h("div", ["脚本更新链接：", lib.h("a", { target: "_blank", href: updatePage }, [updatePage || "无"])])
-            ])
-          );
-          console.log("versions", {
-            notToday: this.cfg.notToday,
-            ignoreVersions: this.cfg.ignoreVersions,
-            version
-          });
-        },
-        oncomplete() {
-          if (this.cfg.autoNotify && lib.$.isInTopWindow()) {
-            if (this.cfg.notToday === -1 || this.cfg.notToday !== new Date().getDate()) {
-              const infos = lib.$gm.getInfos();
-              if (infos) {
-                if (!!valid_1(infos.script.version) === false) {
-                  lib.$message.error(`当前版本号 (${infos.script.version}) 不符合semver版本书写规范，请重新修改版本。`);
-                  return;
-                }
-                setTimeout(async () => {
-                  var _a;
-                  const version = await this.methods.getLastVersion();
-                  const last = version["last-version"];
-                  if (this.cfg.ignoreVersions.includes(last) === false && gt_1(last, infos.script.version)) {
-                    const updatePage = ((_a = this.startConfig) == null ? void 0 : _a.updatePage) || "";
-                    const modal2 = lib.$modal.confirm({
-                      maskCloseable: false,
-                      width: 600,
-                      content: lib.$ui.notes([`检测到新版本发布 ${last} ：`, [...version.notes || []]]),
-                      footer: lib.h("div", [
-                        lib.h("button", { className: "base-style-button-secondary", innerText: "跳过此版本" }, (btn) => {
-                          btn.onclick = () => {
-                            this.cfg.ignoreVersions = [...this.cfg.ignoreVersions, last];
-                            modal2 == null ? void 0 : modal2.remove();
-                          };
-                        }),
-                        lib.h("button", { className: "base-style-button-secondary", innerText: "今日不再提示" }, (btn) => {
-                          btn.onclick = () => {
-                            this.cfg.notToday = new Date().getDate();
-                            modal2 == null ? void 0 : modal2.remove();
-                          };
-                        }),
-                        lib.h("button", { className: "base-style-button", innerText: "前往更新" }, (btn) => {
-                          btn.onclick = () => {
-                            if (updatePage) {
-                              window.open(updatePage, "_blank");
-                              modal2 == null ? void 0 : modal2.remove();
-                            } else {
-                              lib.$message.error({ content: "无法前往更新页面，更新链接为空" });
-                            }
-                          };
-                        })
-                      ])
-                    });
-                  }
-                }, 5 * 1e3);
-              }
-            }
-          }
-        }
-      }),
       dev: new lib.Script({
         name: "🛠️ 开发者调试",
         namespace: "background.dev",
@@ -11008,8 +6194,8 @@ ${content}</tr>
         style: { display: "inline-flex", alignItems: "center" }
       }),
       lib.h("div", { className: "tip-content" }, [
-        lib.h("div", { style: { fontWeight: "bold", marginBottom: "4px" } }, "OCS 答题操作面板"),
-        lib.h("div", "当前页面由 OCS 网课助手自动答题中，可进行以下操作："),
+        lib.h("div", { style: { fontWeight: "bold", marginBottom: "4px" } }, "OOC 答题操作面板"),
+        lib.h("div", "当前页面由 OOC 网课助手自动答题中，可进行以下操作："),
         lib.h("div", "⏸暂停/▶️继续：暂停或恢复自动答题"),
         lib.h("div", "🔃重新答题：刷新页面，重新开始自动答题")
       ])
@@ -12619,10 +7805,10 @@ ${content}</tr>
   function formatQuestionForMessage(question) {
     if (!question)
       return question;
-    const re2 = new RegExp(IMAGE_URL_REGEX.source, IMAGE_URL_REGEX.flags);
+    const re = new RegExp(IMAGE_URL_REGEX.source, IMAGE_URL_REGEX.flags);
     const placeholderMap = /* @__PURE__ */ new Map();
     let counter = 0;
-    return question.replace(re2, (url) => {
+    return question.replace(re, (url) => {
       let p = placeholderMap.get(url);
       if (!p) {
         counter++;
@@ -12902,9 +8088,9 @@ ${content}</tr>
                             lib.h(
                               "a",
                               {
-                                href: "https://docs.ocsjs.com/docs/other/api#全域名通用版本"
+                                href: "https://raw.githubusercontent.com/Chika-Ire/ocsjs-1/5.0/dist/ooc.common.user.js"
                               },
-                              "OCS全域名通用版本"
+                              "OOC 全域名通用版本"
                             ),
                             "，或者手动添加 @connect ，否则无法进行请求。",
                             lib.h(
@@ -13174,7 +8360,7 @@ ${content}</tr>
                   placeholder: "https://api.example.com/v1",
                   style: { width: "100%" }
                 });
-                const aiLabel = (text2) => lib.h("div", { style: { margin: "12px 0 6px", fontSize: "13px", color: "#666" } }, text2);
+                const aiLabel = (text) => lib.h("div", { style: { margin: "12px 0 6px", fontSize: "13px", color: "#666" } }, text);
                 const getAIPreset = () => AI_PROVIDER_PRESETS.find((p) => p.id === aiProviderSelect.value) || AI_PROVIDER_PRESETS[0];
                 const aiBaseUrlRow = lib.h("div", { style: { marginTop: "4px" } }, [
                   aiLabel("接口地址（OpenAI 兼容，可填完整 URL 或 Base URL）"),
@@ -13948,13 +9134,13 @@ ${content}</tr>
             }
             content.replaceChildren(lib.h("span", "搜索中..."));
             if (value) {
-              const t2 = Date.now();
+              const t = Date.now();
               const { env } = await buildAnswererEnv({
                 title: value,
                 enableImageOptimize: CommonProject.scripts.settings.cfg.imageOptimize
               });
               const infos = await defaultAnswerWrapperHandler(CommonProject.scripts.settings.cfg.answererWrappers, env);
-              const resume = ((Date.now() - t2) / 1e3).toFixed(2);
+              const resume = ((Date.now() - t) / 1e3).toFixed(2);
               content.replaceChildren(
                 lib.h(
                   "div",
@@ -14118,12 +9304,12 @@ ${content}</tr>
         ])
       });
     };
-    const gotoHome = lib.h("button", { className: "base-style-button-secondary" }, "🏡官网教程");
-    gotoHome.onclick = () => window.open("https://docs.ocsjs.com", "_blank");
-    const contactUs = lib.h("button", { className: "base-style-button-secondary" }, "🗨️交流群");
-    contactUs.onclick = () => window.open("https://docs.ocsjs.com/docs/about#交流方式", "_blank");
+    const gotoHome = lib.h("button", { className: "base-style-button-secondary" }, "🏡项目主页");
+    gotoHome.onclick = () => window.open("https://github.com/Chika-Ire/ocsjs-1", "_blank");
+    const contactUs = lib.h("button", { className: "base-style-button-secondary" }, "🐛问题反馈");
+    contactUs.onclick = () => window.open("https://github.com/Chika-Ire/ocsjs-1/issues", "_blank");
     const changeLog = lib.h("button", { className: "base-style-button-secondary" }, "📄更新日志");
-    changeLog.onclick = () => BackgroundProject.scripts.update.methods.showChangelog();
+    changeLog.onclick = () => window.open("https://github.com/Chika-Ire/ocsjs-1/commits/5.0", "_blank");
     const closeGuide = lib.h("button", { className: "base-style-button-secondary" }, "📄如何关闭脚本？");
     closeGuide.onclick = () => window.open("https://docs.ocsjs.com/docs/script#%E5%85%B3%E9%97%AD%E8%84%9A%E6%9C%AC%E6%95%99%E7%A8%8B", "_blank");
     return lib.h("div", { className: "user-guide" }, [
@@ -14599,8 +9785,8 @@ ${content}</tr>
         if (is_resource_box_mode) {
           videoItems = videoItems.filter((el) => {
             var _a;
-            const text2 = ((_a = el.querySelector(".resource-text")) == null ? void 0 : _a.textContent) || "";
-            const [progress, total] = text2.replace("必学", "").trim().split("/").map((s) => parseInt(s));
+            const text = ((_a = el.querySelector(".resource-text")) == null ? void 0 : _a.textContent) || "";
+            const [progress, total] = text.replace("必学", "").trim().split("/").map((s) => parseInt(s));
             return progress < total;
           });
         } else {
@@ -15351,7 +10537,7 @@ ${content}</tr>
                 const works = [];
                 for (let index = 0; index < infos.length; index++) {
                   const info = infos[index];
-                  const text2 = ((_a = info.querySelector(".collapse-info-progress .progress-text")) == null ? void 0 : _a.textContent) || "";
+                  const text = ((_a = info.querySelector(".collapse-info-progress .progress-text")) == null ? void 0 : _a.textContent) || "";
                   if (this.cfg.switchMode === "all") {
                     works.push({
                       info,
@@ -15359,7 +10545,7 @@ ${content}</tr>
                       total: 1
                     });
                   } else {
-                    const [progress, total] = text2.replace("必学", "").trim().split("/").map((s) => parseInt(s));
+                    const [progress, total] = text.replace("必学", "").trim().split("/").map((s) => parseInt(s));
                     if (progress < total) {
                       works.push({ progress, total, info });
                     }
@@ -15515,7 +10701,7 @@ ${content}</tr>
             start: async () => {
               var _a;
               let remotePage;
-              const remote_not_required = remote_not_required_pages.some((domain2) => location.href.includes(domain2));
+              const remote_not_required = remote_not_required_pages.some((domain) => location.href.includes(domain));
               remote_not_required ? await waitForElement(".exam-item") : await waitForElement(".questionContent");
               if (remote_not_required)
                 ;
@@ -16593,9 +11779,9 @@ ${content}</tr>
               await lib.$.sleep(200);
             }
           } else if (type === "completion" && answer.trim()) {
-            const text2 = option.querySelector("textarea");
-            if (text2) {
-              text2.value = answer;
+            const text = option.querySelector("textarea");
+            if (text) {
+              text.value = answer;
               await lib.$.sleep(200);
             }
           }
@@ -16658,7 +11844,7 @@ ${content}</tr>
     lib.$message.info({ content: "开始作业" });
     CommonProject.scripts.workResults.methods.init({ dynamic: true });
     const titleTransform = (titles) => {
-      return titles.filter((t2) => t2 == null ? void 0 : t2.innerText).map((t2) => t2 ? extractTextWithImages(t2).text : "").join(",");
+      return titles.filter((t) => t == null ? void 0 : t.innerText).map((t) => t ? extractTextWithImages(t).text : "").join(",");
     };
     const worker = new OCSWorker({
       root: "div:has(> .questionContent)",
@@ -16683,9 +11869,9 @@ ${content}</tr>
               await lib.$.sleep(200);
             }
           } else if (type === "completion" && answer.trim()) {
-            const text2 = option.querySelector("textarea");
-            if (text2) {
-              text2.value = answer;
+            const text = option.querySelector("textarea");
+            if (text) {
+              text.value = answer;
               await lib.$.sleep(200);
             }
           }
@@ -16719,7 +11905,7 @@ ${content}</tr>
     lib.$message.info({ content: "开始作业" });
     CommonProject.scripts.workResults.methods.init({ dynamic: true });
     const titleTransformWithImages = (titles) => {
-      const results = titles.filter((t2) => t2 == null ? void 0 : t2.innerText).map((t2) => t2 ? extractTextWithImages(t2) : { text: "", images: [] });
+      const results = titles.filter((t) => t == null ? void 0 : t.innerText).map((t) => t ? extractTextWithImages(t) : { text: "", images: [] });
       return {
         text: results.map((r) => r.text).join(","),
         images: results.flatMap((r) => r.images)
@@ -16841,7 +12027,7 @@ ${content}</tr>
     lib.$message.info({ content: "开始作业" });
     CommonProject.scripts.workResults.methods.init({ dynamic: true });
     const titleTransformWithImages = (titles) => {
-      const results = titles.filter((t2) => t2 == null ? void 0 : t2.innerText).map((t2) => t2 ? extractTextWithImages(t2) : { text: "", images: [] });
+      const results = titles.filter((t) => t == null ? void 0 : t.innerText).map((t) => t ? extractTextWithImages(t) : { text: "", images: [] });
       return {
         text: results.map((r) => r.text).join(","),
         images: results.flatMap((r) => r.images)
@@ -16967,7 +12153,7 @@ ${content}</tr>
       questionPositionSyncHandlerType: "zhs-fusion"
     });
     const titleTransform = (titles) => {
-      return titles.filter((t2) => t2 == null ? void 0 : t2.innerText).map((t2) => t2 ? extractTextWithImages(t2).text : "").join(",");
+      return titles.filter((t) => t == null ? void 0 : t.innerText).map((t) => t ? extractTextWithImages(t).text : "").join(",");
     };
     const worker = new OCSWorker({
       root: ".exam-item",
@@ -17053,7 +12239,7 @@ ${content}</tr>
       dynamic: true
     });
     const titleTransform = (titles) => {
-      return titles.filter((t2) => t2 == null ? void 0 : t2.innerText).map((t2) => t2 ? extractTextWithImages(t2).text : "").join(",");
+      return titles.filter((t) => t == null ? void 0 : t.innerText).map((t) => t ? extractTextWithImages(t).text : "").join(",");
     };
     const worker = new OCSWorker({
       root: ".q_main",
@@ -17142,7 +12328,7 @@ ${content}</tr>
   function hikeHomework(remotePage, { answererWrappers, period, thread, answerSeparators }) {
     lib.$message.info({ content: "开始作业" });
     const titleTransform = (titles) => {
-      return titles.filter((t2) => t2 == null ? void 0 : t2.innerText).map((t2) => t2 ? extractTextWithImages(t2).text : "").join(",");
+      return titles.filter((t) => t == null ? void 0 : t.innerText).map((t) => t ? extractTextWithImages(t).text : "").join(",");
     };
     const worker = new OCSWorker({
       root: ".question-item",
@@ -17233,7 +12419,7 @@ ${content}</tr>
         }
       }, 1e3);
       const val = ((_b = (ZHSProject.scripts["gxk-study"].configs.stopTime.options || []).find(
-        (t2) => t2[0] === stopTime2
+        (t) => t[0] === stopTime2
       )) == null ? void 0 : _b[0]) || "0";
       const date = new Date();
       date.setMinutes(date.getMinutes() + parseFloat(val) * 60);
@@ -17827,8 +13013,8 @@ self.onmessage = function (e) {
     }
     return { map, details };
   }
-  function decryptText(text2, map) {
-    return [...text2].map((c) => {
+  function decryptText(text, map) {
+    return [...text].map((c) => {
       var _a;
       return (_a = map[c]) != null ? _a : c;
     }).join("");
@@ -17848,11 +13034,11 @@ self.onmessage = function (e) {
   }
   function collectChars(roots) {
     var _a;
-    let text2 = "";
+    let text = "";
     for (const root2 of Array.isArray(roots) ? roots : [roots]) {
-      text2 += (_a = root2.textContent) != null ? _a : "";
+      text += (_a = root2.textContent) != null ? _a : "";
     }
-    return text2;
+    return text;
   }
   function findFontUrls(doc = document) {
     var _a, _b;
@@ -18445,7 +13631,7 @@ self.onmessage = function (e) {
         async oncomplete() {
           if (top$1 === window) {
             lib.$message.warn({
-              content: "OCS网课助手不支持旧版超星, 即将切换到超星新版, 如有其他第三方插件请关闭, 可能有兼容问题导致频繁切换。",
+              content: "OOC 网课助手不支持旧版超星, 即将切换到超星新版, 如有其他第三方插件请关闭, 可能有兼容问题导致频繁切换。",
               duration: 0
             });
             await $.sleep(2e3);
@@ -18660,11 +13846,11 @@ self.onmessage = function (e) {
         }
         return "";
       }).join("\n");
-      const text2 = removeRedundantWords(
+      const text = removeRedundantWords(
         StringUtils.of(optimizationTitle).nowrap(is_multiple_question ? "\n" : " ").nospace().toString().trim(),
         redundanceWordsText.split("\n")
       );
-      return { text: text2, images };
+      return { text, images };
     };
     const workOrExamQuestionTitleText = (titles) => workOrExamQuestionTitleTransform(titles).text;
     const worker = new OCSWorker({
@@ -18718,9 +13904,9 @@ self.onmessage = function (e) {
         var _a, _b;
         const { elements: elements2, searchInfos } = ctx;
         const type2 = getQuestionType(
-          parseInt(((_a = elements2.type.find((t2) => {
+          parseInt(((_a = elements2.type.find((t) => {
             var _a2;
-            return (_a2 = t2.getAttribute("name")) == null ? void 0 : _a2.match(/type\d+/);
+            return (_a2 = t.getAttribute("name")) == null ? void 0 : _a2.match(/type\d+/);
           })) == null ? void 0 : _a.getAttribute("value")) || "-1")
         );
         if (type2 && (type2 === "completion" || type2 === "multiple" || type2 === "judgement" || type2 === "single")) {
@@ -18733,10 +13919,10 @@ self.onmessage = function (e) {
                 await $.sleep(500);
               }
             } else if (type3 === "completion" && answer.trim()) {
-              const text2 = option == null ? void 0 : option.querySelector("textarea");
+              const text = option == null ? void 0 : option.querySelector("textarea");
               const textareaFrame = option == null ? void 0 : option.querySelector("iframe");
-              if (text2) {
-                text2.value = answer;
+              if (text) {
+                text.value = answer;
               }
               if (textareaFrame == null ? void 0 : textareaFrame.contentDocument) {
                 textareaFrame.contentDocument.body.innerHTML = answer;
@@ -18829,12 +14015,12 @@ self.onmessage = function (e) {
     lib.$message.info(`开始作业随堂练习`);
     CommonProject.scripts.workResults.methods.init();
     function titleText(el) {
-      const clone2 = el.cloneNode(true);
-      return extractTextWithImages(clone2).text;
+      const clone = el.cloneNode(true);
+      return extractTextWithImages(clone).text;
     }
     const redundanceWords = opts.redundanceWordsText.split("\n").filter(Boolean);
-    const titleTransform = (titles) => titles.filter((t2) => t2 == null ? void 0 : t2.innerText).map(
-      (t2) => t2 ? removeRedundantWords(StringUtils.of(titleText(t2)).nowrap(" ").nospace().toString().trim(), redundanceWords) : ""
+    const titleTransform = (titles) => titles.filter((t) => t == null ? void 0 : t.innerText).map(
+      (t) => t ? removeRedundantWords(StringUtils.of(titleText(t)).nowrap(" ").nospace().toString().trim(), redundanceWords) : ""
     ).join(",");
     const worker = new OCSWorker({
       root: ".question-item",
@@ -18867,10 +14053,10 @@ self.onmessage = function (e) {
               await $.sleep(500);
             }
           } else if (type === "completion" && answer.trim()) {
-            const text2 = option == null ? void 0 : option.querySelector("textarea");
+            const text = option == null ? void 0 : option.querySelector("textarea");
             const textareaFrame = option == null ? void 0 : option.querySelector("iframe");
-            if (text2) {
-              text2.value = answer;
+            if (text) {
+              text.value = answer;
             }
             if (textareaFrame == null ? void 0 : textareaFrame.contentDocument) {
               textareaFrame.contentDocument.body.innerHTML = answer;
@@ -18917,7 +14103,7 @@ self.onmessage = function (e) {
     if (fonts.length === 0) {
       return;
     }
-    const t2 = Date.now();
+    const t = Date.now();
     try {
       const { map, details } = await crackFont(fontBuffer, collectChars(fonts), {
         refTableUrl: CX_SECRET_REF_TABLE_URL,
@@ -18931,7 +14117,7 @@ self.onmessage = function (e) {
       }
       decryptElements(fonts, map);
       fonts.forEach((el) => el.classList.remove("font-cxsecret"));
-      $console.info("文字解密完成，耗时 " + ((Date.now() - t2) / 1e3).toFixed(1) + " 秒");
+      $console.info("文字解密完成，耗时 " + ((Date.now() - t) / 1e3).toFixed(1) + " 秒");
     } catch (err) {
       $console.error("加密文字识别失败：", String(err));
       lib.$message.error("加密文字识别失败：" + String(err));
@@ -19081,8 +14267,8 @@ self.onmessage = function (e) {
             if (vjs.videoJsResolutionSwitcher) {
               vjs.on("resolutionchange", function() {
                 const cr = vjs.currentResolution();
-                const re2 = cr.sources ? cr.sources[0].res : false;
-                Ext.setCookie("resolution", re2);
+                const re = cr.sources ? cr.sources[0].res : false;
+                Ext.setCookie("resolution", re);
               });
             }
             if (vjs.videoJsPlayLine) {
@@ -19485,17 +14671,17 @@ self.onmessage = function (e) {
       const chapterTestTaskQuestionTitleTransform = (titles) => {
         const images = [];
         const removed = removeRedundantWords(
-          titles.map((t2) => {
-            if (!t2)
+          titles.map((t) => {
+            if (!t)
               return "";
-            const extracted = extractTextWithImages(t2);
+            const extracted = extractTextWithImages(t);
             images.push(...extracted.images);
             return extracted.text;
           }).join(","),
           redundanceWordsText.split("\n")
         );
-        const text2 = removed.trim().replace(/^\d+[。、.]/, "").replace(/（\d+\.\d+分）/, "").replace(/\(..题, \d+?分\)/, "").replace(/\(..题, \d+\.\d+分\)/, "").replace(/[[(【（](..题|名词解释|完形填空|阅读理解)[\])】）]/, "").trim();
-        return { text: text2, images };
+        const text = removed.trim().replace(/^\d+[。、.]/, "").replace(/（\d+\.\d+分）/, "").replace(/\(..题, \d+?分\)/, "").replace(/\(..题, \d+\.\d+分\)/, "").replace(/[[(【（](..题|名词解释|完形填空|阅读理解)[\])】）]/, "").trim();
+        return { text, images };
       };
       const chapterTestTaskQuestionTitleText = (titles) => chapterTestTaskQuestionTitleTransform(titles).text;
       const worker = new OCSWorker({
@@ -19544,10 +14730,10 @@ self.onmessage = function (e) {
                   option == null ? void 0 : option.click();
                 }
               } else if (type2 === "completion" && answer.trim()) {
-                const text2 = (_d = option == null ? void 0 : option.parentElement) == null ? void 0 : _d.querySelector("textarea");
+                const text = (_d = option == null ? void 0 : option.parentElement) == null ? void 0 : _d.querySelector("textarea");
                 const textareaFrame = (_e = option == null ? void 0 : option.parentElement) == null ? void 0 : _e.querySelector("iframe");
-                if (text2) {
-                  text2.value = answer;
+                if (text) {
+                  text.value = answer;
                 }
                 if (textareaFrame == null ? void 0 : textareaFrame.contentDocument) {
                   textareaFrame.contentDocument.body.innerHTML = answer;
@@ -19575,9 +14761,9 @@ self.onmessage = function (e) {
                     const box = elements2.lineSelectBox[index];
                     if (splited_ans[index]) {
                       select(box, splited_ans[index]);
-                      const text2 = (_a = box.parentElement) == null ? void 0 : _a.querySelector(".chosen-single span");
-                      if (text2)
-                        text2.textContent = splited_ans[index];
+                      const text = (_a = box.parentElement) == null ? void 0 : _a.querySelector(".chosen-single span");
+                      if (text)
+                        text.textContent = splited_ans[index];
                       await $.sleep(200);
                     }
                   }
@@ -19614,14 +14800,14 @@ self.onmessage = function (e) {
               for (const option of options) {
                 const textarea = (_h = option == null ? void 0 : option.parentElement) == null ? void 0 : _h.querySelector("textarea");
                 const completeTexts = commonSetting["randomWork-completeTexts-textarea"].split("\n").filter(Boolean);
-                const text2 = completeTexts[Math.floor(Math.random() * completeTexts.length)];
+                const text = completeTexts[Math.floor(Math.random() * completeTexts.length)];
                 const textareaFrame = (_i = option == null ? void 0 : option.parentElement) == null ? void 0 : _i.querySelector("iframe");
-                if (text2) {
+                if (text) {
                   if (textarea) {
-                    textarea.value = text2;
+                    textarea.value = text;
                   }
                   if (textareaFrame == null ? void 0 : textareaFrame.contentDocument) {
-                    textareaFrame.contentDocument.body.innerHTML = text2;
+                    textareaFrame.contentDocument.body.innerHTML = text;
                   }
                 } else {
                   $console.error("请设置随机填空的文案");
@@ -19712,7 +14898,7 @@ self.onmessage = function (e) {
     }
   };
   function getQuestionType(val) {
-    return val === 0 ? "single" : val === 1 ? "multiple" : val === 3 ? "judgement" : [2, 4, 5, 6, 7, 8, 9, 10].some((t2) => t2 === val) ? "completion" : val === 11 ? "line" : val === 14 ? "fill" : val === 15 ? "reader" : void 0;
+    return val === 0 ? "single" : val === 1 ? "multiple" : val === 3 ? "judgement" : [2, 4, 5, 6, 7, 8, 9, 10].some((t) => t === val) ? "completion" : val === 11 ? "line" : val === 14 ? "fill" : val === 15 ? "reader" : void 0;
   }
   async function readerAndFillHandle(searchInfos, list) {
     var _a;
@@ -20485,10 +15671,10 @@ self.onmessage = function (e) {
     console.log({ answererWrappers, period, thread });
     const titleTransformWithImages = (titles) => {
       const images = [];
-      const text2 = titles.filter((t2) => (t2 == null ? void 0 : t2.innerText) || (t2 == null ? void 0 : t2.querySelector("img"))).map((t2) => {
+      const text = titles.filter((t) => (t == null ? void 0 : t.innerText) || (t == null ? void 0 : t.querySelector("img"))).map((t) => {
         var _a, _b;
-        if (t2) {
-          const title = t2.cloneNode(true);
+        if (t) {
+          const title = t.cloneNode(true);
           (_a = title.querySelector('[name*="questionIndex"]')) == null ? void 0 : _a.remove();
           (_b = title.querySelector(".q_score")) == null ? void 0 : _b.remove();
           const extracted = extractTextWithImages(title);
@@ -20497,7 +15683,7 @@ self.onmessage = function (e) {
         }
         return "";
       }).join(",");
-      return { text: text2, images };
+      return { text, images };
     };
     const titleTransform = (titles) => titleTransformWithImages(titles).text;
     function getType(options) {
@@ -20559,10 +15745,10 @@ self.onmessage = function (e) {
                 (_a = lib.$el("div", option)) == null ? void 0 : _a.click();
               }
             } else if (type2 === "completion" && answer.trim()) {
-              const text2 = option.querySelector("textarea");
+              const text = option.querySelector("textarea");
               const textIframe = option.querySelector('iframe[id*="ueditor"]');
-              if (text2) {
-                text2.value = answer;
+              if (text) {
+                text.value = answer;
               }
               if (textIframe) {
                 const view = (_b = textIframe.contentWindow) == null ? void 0 : _b.document.querySelector("body.view > p");
@@ -20613,15 +15799,15 @@ self.onmessage = function (e) {
     console.log({ answererWrappers, period, thread });
     const titleTransform = (titles) => {
       const images = [];
-      const text2 = titles.filter((t2) => (t2 == null ? void 0 : t2.innerText) || (t2 == null ? void 0 : t2.querySelector("img"))).map((t2) => {
-        if (t2) {
-          const extracted = extractTextWithImages(t2);
+      const text = titles.filter((t) => (t == null ? void 0 : t.innerText) || (t == null ? void 0 : t.querySelector("img"))).map((t) => {
+        if (t) {
+          const extracted = extractTextWithImages(t);
           images.push(...extracted.images);
           return extracted.text.replace(/\s+/g, " ").trim() || "";
         }
         return "";
       }).join(",");
-      return { text: text2, images };
+      return { text, images };
     };
     const titleText = (titles) => titleTransform(titles).text;
     function getType(options) {
@@ -20970,9 +16156,9 @@ self.onmessage = function (e) {
               if (["ppt", "doc", "pptx", "docx", "pdf", "txt", "ppt文档", "xls", "xlsx"].some((i) => courseType === i)) {
                 await watchFile(this.cfg.pptReadPeriod);
               } else if (["video", "audio", "mp4", "mp3", "flv", "wav", "视频"].some((i) => courseType === i)) {
-                const text2 = ((_a = lib.$el(".guide")) == null ? void 0 : _a.textContent) || "";
+                const text = ((_a = lib.$el(".guide")) == null ? void 0 : _a.textContent) || "";
                 msg2 = `任务点 ${courseInfo.name}，不支持播放。`;
-                if (text2.includes("很抱歉，您的浏览器不支持播放此类文件") || text2.includes("此视频暂无法播放")) {
+                if (text.includes("很抱歉，您的浏览器不支持播放此类文件") || text.includes("此视频暂无法播放")) {
                   msg2 = `任务点 ${courseInfo.name}，不支持播放。`;
                   lib.$message.error(msg2);
                   $console.error(msg2);
@@ -21267,7 +16453,7 @@ self.onmessage = function (e) {
       questionPositionSyncHandlerType: "zjy"
     });
     const titleTransform = (titles) => {
-      return titles.filter((t2) => t2 == null ? void 0 : t2.innerText).map((t2) => t2 == null ? void 0 : t2.innerText).join(",");
+      return titles.filter((t) => t == null ? void 0 : t.innerText).map((t) => t == null ? void 0 : t.innerText).join(",");
     };
     const worker = new OCSWorker({
       root: ".subjectDet",
@@ -21297,11 +16483,11 @@ self.onmessage = function (e) {
               (_b = option.querySelector("label")) == null ? void 0 : _b.click();
             }
           } else if (type2 === "completion" && answer.trim()) {
-            const text2 = option.querySelector('input[type="text"]');
+            const text = option.querySelector('input[type="text"]');
             const textarea = option.querySelector("textarea");
-            if (text2) {
-              text2.value = answer;
-              text2.dispatchEvent(new Event("input", { bubbles: true }));
+            if (text) {
+              text.value = answer;
+              text.dispatchEvent(new Event("input", { bubbles: true }));
             } else if (textarea) {
               textarea.value = answer;
               textarea.dispatchEvent(new Event("input", { bubbles: true }));
@@ -21929,18 +17115,18 @@ self.onmessage = function (e) {
     });
     const titleTransform = (titles) => {
       const images = [];
-      const text2 = removeRedundantWords(
-        titles.filter((t2) => (t2 == null ? void 0 : t2.innerText) || (t2 == null ? void 0 : t2.querySelector("img"))).map((t2) => {
-          if (t2) {
-            const extracted = extractTextWithImages(t2);
+      const text = removeRedundantWords(
+        titles.filter((t) => (t == null ? void 0 : t.innerText) || (t == null ? void 0 : t.querySelector("img"))).map((t) => {
+          if (t) {
+            const extracted = extractTextWithImages(t);
             images.push(...extracted.images);
             return extracted.text.replace(/\s+/g, " ").trim() || "";
           }
           return "";
-        }).filter((t2) => t2.trim() !== "").join(",").replace(/[\u200A-\u200F]/g, ""),
+        }).filter((t) => t.trim() !== "").join(",").replace(/[\u200A-\u200F]/g, ""),
         redundanceWordsText.split("\n")
       );
-      return { text: text2, images };
+      return { text, images };
     };
     const titleText = (titles) => titleTransform(titles).text;
     const work_type = type;
@@ -21978,12 +17164,12 @@ self.onmessage = function (e) {
                 });
               }
             }
-            const text2 = option.querySelector(".f-richEditorText");
+            const text = option.querySelector(".f-richEditorText");
             const input = option.querySelector("input");
-            if (input && !(input == null ? void 0 : input.checked) && text2) {
+            if (input && !(input == null ? void 0 : input.checked) && text) {
               await networkIdleRequire(rp, async () => {
                 await $.sleep(1e3);
-                await rp.click(text2);
+                await rp.click(text);
               });
             }
           } else if (type2 === "completion" && answer.trim()) {
@@ -22063,18 +17249,18 @@ self.onmessage = function (e) {
   function chapter_v2(rp, { answererWrappers, redundanceWordsText, upload, stopSecondWhenFinish, answerSeparators }) {
     const titleTransform = (titles) => {
       const images = [];
-      const text2 = removeRedundantWords(
-        titles.filter((t2) => (t2 == null ? void 0 : t2.innerText) || (t2 == null ? void 0 : t2.querySelector("img"))).map((t2) => {
-          if (t2) {
-            const extracted = extractTextWithImages(t2);
+      const text = removeRedundantWords(
+        titles.filter((t) => (t == null ? void 0 : t.innerText) || (t == null ? void 0 : t.querySelector("img"))).map((t) => {
+          if (t) {
+            const extracted = extractTextWithImages(t);
             images.push(...extracted.images);
             return extracted.text.replace(/\s+/g, " ").trim() || "";
           }
           return "";
-        }).filter((t2) => t2.trim() !== "").join(",").replace(/[\u200A-\u200F]/g, ""),
+        }).filter((t) => t.trim() !== "").join(",").replace(/[\u200A-\u200F]/g, ""),
         redundanceWordsText.split("\n")
       );
-      return { text: text2, images };
+      return { text, images };
     };
     const titleText = (titles) => titleTransform(titles).text;
     const worker = new OCSWorker({
@@ -22814,13 +18000,13 @@ self.onmessage = function (e) {
   }
   function fillYktUEditor(iframe, answer) {
     var _a, _b, _c;
-    const html2 = "<p>" + answer.trim().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n+/g, "</p><p>") + "</p>";
+    const html = "<p>" + answer.trim().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n+/g, "</p><p>") + "</p>";
     const containerId = (_a = iframe.closest('[id^="ueditor-"]')) == null ? void 0 : _a.id;
     const ue = (_b = iframe.ownerDocument.defaultView) == null ? void 0 : _b.UE;
     if (containerId && ue) {
       try {
         const editor = ue.getEditor(containerId);
-        editor.ready(() => editor.setContent(html2));
+        editor.ready(() => editor.setContent(html));
         return;
       } catch (err) {
         $console.warn("[answer] UEditor API 填充失败，尝试直接写入：", String(err));
@@ -22828,7 +18014,7 @@ self.onmessage = function (e) {
     }
     const body = (_c = iframe.contentDocument) == null ? void 0 : _c.body;
     if (body) {
-      body.innerHTML = html2;
+      body.innerHTML = html;
       body.dispatchEvent(new Event("input", { bubbles: true }));
     }
   }
@@ -22893,19 +18079,19 @@ self.onmessage = function (e) {
   }
   const YKT_BLANK_INPUT_SELECTOR = 'input.blank-item-dynamic, input[placeholder="输入答案"]';
   function cloneYktForTextExtract(el) {
-    const clone2 = el.cloneNode(true);
-    for (const img of Array.from(clone2.querySelectorAll("img.kfformula"))) {
+    const clone = el.cloneNode(true);
+    for (const img of Array.from(clone.querySelectorAll("img.kfformula"))) {
       const latex = img.getAttribute("data-latex") || (img.getAttribute("data-slatex") || "").replace(/\\\\/g, "\\");
       img.replaceWith(latex.trim() ? ` $${latex}$ ` : " [公式] ");
     }
-    return clone2;
+    return clone;
   }
   function extractYktTitleText(el) {
-    const clone2 = cloneYktForTextExtract(el);
-    for (const input of Array.from(clone2.querySelectorAll(YKT_BLANK_INPUT_SELECTOR))) {
+    const clone = cloneYktForTextExtract(el);
+    for (const input of Array.from(clone.querySelectorAll(YKT_BLANK_INPUT_SELECTOR))) {
       input.replaceWith("____");
     }
-    return extractTextWithImages(clone2).text;
+    return extractTextWithImages(clone).text;
   }
   function createYktAnswerWorker({
     answererWrappers,
@@ -22915,12 +18101,12 @@ self.onmessage = function (e) {
     answerSeparators
   }) {
     const redundanceWords = redundanceWordsText.split("\n").filter(Boolean);
-    const titleTransform = (titles) => titles.filter((t2) => {
+    const titleTransform = (titles) => titles.filter((t) => {
       var _a;
-      return !!t2 && (!!((_a = t2.textContent) == null ? void 0 : _a.trim()) || !!t2.querySelector("img"));
+      return !!t && (!!((_a = t.textContent) == null ? void 0 : _a.trim()) || !!t.querySelector("img"));
     }).map(
-      (t2) => t2 ? removeRedundantWords(
-        StringUtils.of(extractYktTitleText(t2)).nowrap(" ").nospace().toString().trim(),
+      (t) => t ? removeRedundantWords(
+        StringUtils.of(extractYktTitleText(t)).nowrap(" ").nospace().toString().trim(),
         redundanceWords
       ) : ""
     ).join(",");
@@ -22988,14 +18174,14 @@ self.onmessage = function (e) {
         return await resolver(
           ctx.searchInfos,
           (_c = ctx.elements.options) != null ? _c : [],
-          async (t2, answer, option) => {
+          async (t, answer, option) => {
             var _a2;
-            if (t2 === "judgement" || t2 === "single" || t2 === "multiple") {
+            if (t === "judgement" || t === "single" || t === "multiple") {
               if (option && !option.classList.contains("is-checked") && ((_a2 = option.querySelector("input")) == null ? void 0 : _a2.checked) !== true) {
                 option.click();
                 await lib.$.sleep(300);
               }
-            } else if (t2 === "completion" && answer.trim()) {
+            } else if (t === "completion" && answer.trim()) {
               if ((option == null ? void 0 : option.tagName) === "IFRAME") {
                 fillYktUEditor(option, answer);
                 await lib.$.sleep(300);
@@ -25362,46 +20548,6 @@ modal-element .modal-cancel-button:hover {
   opacity: 0.4;
   cursor: default;
 }
-.aw-card-status-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex: none;
-}
-.aw-card-status {
-  flex: none;
-  font-size: 11px;
-  line-height: 18px;
-  padding: 0 8px;
-  border-radius: 999px;
-  background-color: #eef2f7;
-  color: #5a6b85;
-  white-space: nowrap;
-}
-.aw-card-status.probing {
-  color: #9aa4b2;
-}
-.aw-card-status.success {
-  background-color: #e8f7ee;
-  color: #2e7d4f;
-}
-.aw-card-status.error,
-.aw-card-status.invalid {
-  background-color: #fdeeee;
-  color: #c0392b;
-}
-.aw-card-status.timeout {
-  background-color: #fdf3e5;
-  color: #b26a00;
-}
-.aw-card-status.disabled {
-  background-color: #eef2f7;
-  color: #8a94a6;
-}
-.aw-card-status.latency {
-  background-color: #eef2f7;
-  color: #5a6b85;
-}
 .aw-card-rows {
   list-style: none;
   padding: 0;
@@ -25632,7 +20778,7 @@ if (
 	].some((api) => typeof Reflect.get(globalThis, api) === 'undefined')
 ) {
 	const open = confirm(
-		`OCS网课脚本不支持当前的脚本管理器（${GM_info.scriptHandler}）。` +
+		`OOC 网课助手不支持当前的脚本管理器（${GM_info.scriptHandler}）。` +
 		'请前往 https://docs.ocsjs.com/docs/script 下载指定的脚本管理器，例如 “Scriptcat 脚本猫” 或者 “Tampermonkey 油猴”'
 	);
 
@@ -25642,7 +20788,7 @@ if (
 	return;
 }
 
-const { start, definedProjects, CommonProject, RenderScript, logoSvg } = OCS;
+const { start, definedProjects, CommonProject, RenderScript } = OCS;
 
 const infos = GM_info;
 
@@ -25658,8 +20804,8 @@ const infos = GM_info;
 			renderScript: RenderScript,
 			styles: [STYLE],
 			defaultPanelName: CommonProject.scripts.guide.namespace,
-			title: `${logoSvg} OCS <span style="font-size: 12px; color: #969696;">v${infos.script.version}</span>`
+			title: `OOC <span style="font-size: 12px; color: #969696;">v${infos.script.version}</span>`
 		},
-		updatePage: 'https://docs.ocsjs.com/docs/update'
+		updatePage: 'https://github.com/Chika-Ire/ocsjs-1'
 	});
 })();

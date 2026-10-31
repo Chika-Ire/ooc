@@ -411,10 +411,10 @@ export const CommonProject = Project.create({
 													'配置成功，但检测到以下 域名/ip 不在脚本的白名单中，请安装 : ',
 													h(
 														'a',
-														{
-															href: 'https://docs.ocsjs.com/docs/other/api#全域名通用版本'
-														},
-														'OCS全域名通用版本'
+															{
+																href: 'https://raw.githubusercontent.com/Chika-Ire/ocsjs-1/5.0/dist/ooc.common.user.js'
+															},
+														'OOC 全域名通用版本'
 													),
 													'，或者手动添加 @connect ，否则无法进行请求。',
 													h(
@@ -1863,14 +1863,14 @@ const createGuide = () => {
 		});
 	};
 
-	const gotoHome = h('button', { className: 'base-style-button-secondary' }, '🏡官网教程');
-	gotoHome.onclick = () => window.open('https://docs.ocsjs.com', '_blank');
+	const gotoHome = h('button', { className: 'base-style-button-secondary' }, '🏡项目主页');
+	gotoHome.onclick = () => window.open('https://github.com/Chika-Ire/ocsjs-1', '_blank');
 
-	const contactUs = h('button', { className: 'base-style-button-secondary' }, '🗨️交流群');
-	contactUs.onclick = () => window.open('https://docs.ocsjs.com/docs/about#交流方式', '_blank');
+	const contactUs = h('button', { className: 'base-style-button-secondary' }, '🐛问题反馈');
+	contactUs.onclick = () => window.open('https://github.com/Chika-Ire/ocsjs-1/issues', '_blank');
 
 	const changeLog = h('button', { className: 'base-style-button-secondary' }, '📄更新日志');
-	changeLog.onclick = () => BackgroundProject.scripts.update.methods.showChangelog();
+	changeLog.onclick = () => window.open('https://github.com/Chika-Ire/ocsjs-1/commits/5.0', '_blank');
 
 	const closeGuide = h('button', { className: 'base-style-button-secondary' }, '📄如何关闭脚本？');
 	closeGuide.onclick = () =>

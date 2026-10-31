@@ -26,7 +26,7 @@ function getContainer(): HTMLElement | undefined {
 
 /**
  * 边缘最小化判定：
- * 窗口为 minimize 状态且面板中心点位于视口左右 100px 吸附范围内时，进入图标吸附模式（隐藏头部、仅显示 OCS 图标）；
+ * 窗口为 minimize 状态且面板中心点位于视口左右 100px 吸附范围内时，进入图标吸附模式（隐藏头部、仅显示 OOC 图标）；
  * 否则退出图标模式，恢复普通最小化头部。
  */
 export function updateEdgeMode() {
