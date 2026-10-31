@@ -39,7 +39,9 @@
 **方式 A：直接导入（推荐）**
 
 1. 浏览器安装 [Tampermonkey](https://www.tampermonkey.net/) 或 Violentmonkey。
-2. 打开 Tampermonkey 管理面板 → **实用工具 → 从文件导入**，选择本仓库的 `dist/ocs.user.js`；也可以直接把文件拖进浏览器窗口。
+2. 选择任意一种方式安装脚本：
+   - **一键安装**：在浏览器中打开 <https://raw.githubusercontent.com/Chika-Ire/ocsjs-1/5.0/dist/ocs.user.js>，Tampermonkey 会弹出安装页面。
+   - **本地导入**：打开 Tampermonkey 管理面板 → **实用工具 → 从文件导入**，选择本仓库的 `dist/ocs.user.js`；也可以直接把文件拖进浏览器窗口。
 3. 打开学习通、智慧树等课程页面，等待 OCS 悬浮窗出现。
 
 **方式 B：自行构建**
