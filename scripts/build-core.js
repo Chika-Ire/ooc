@@ -96,7 +96,9 @@ function createOptions(ocs) {
 				'localhost',
 				'127.0.0.1',
 				// 智慧树阿里云资源，应用： 图片题资源访问
-				'aliyuncs.com'
+				'aliyuncs.com',
+				// AI 搜题接口（DeepSeek），应用： 题库配置调用大模型
+				'api.deepseek.com'
 			],
 			match: matchMetadata,
 			grant: [
