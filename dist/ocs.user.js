@@ -64,6 +64,8 @@
 // @connect    				127.0.0.1
 // @connect    				aliyuncs.com
 // @connect    				api.deepseek.com
+// @connect    				api.openai.com
+// @connect    				api.anthropic.com
 // @antifeature				payment
 // ==/UserScript==
 
@@ -12311,6 +12313,146 @@ ${content}</tr>
       });
     });
   }
+  const AI_PROVIDER_PRESETS = [
+    {
+      id: "deepseek",
+      label: "DeepSeek",
+      protocol: "openai",
+      url: "https://api.deepseek.com/chat/completions",
+      model: "deepseek-chat",
+      homepage: "https://platform.deepseek.com"
+    },
+    {
+      id: "openai",
+      label: "OpenAI",
+      protocol: "openai",
+      url: "https://api.openai.com/v1/chat/completions",
+      model: "gpt-4o-mini",
+      homepage: "https://platform.openai.com"
+    },
+    {
+      id: "anthropic",
+      label: "Anthropic (Claude)",
+      protocol: "anthropic",
+      url: "https://api.anthropic.com/v1/messages",
+      model: "claude-3-5-haiku-latest",
+      homepage: "https://console.anthropic.com"
+    },
+    {
+      id: "custom",
+      label: "自定义（OpenAI 兼容）",
+      protocol: "openai",
+      url: "",
+      model: "gpt-4o-mini",
+      homepage: ""
+    }
+  ];
+  const SYSTEM_PROMPT = '只输出JSON：{"answer":"答案"}。单选题只答选项字母；多选题字母连写（如ABC）；判断题只答“对”或“错”，禁止答字母；填空简答答答案文本。';
+  const USER_CONTENT_EXPR = "'题型：' + (env.type === 'judgement' ? '判断题，只答对或错，禁止答字母' : env.type) + '。题目：' + env.title + (env.options ? ' 选项：' + env.options : '')";
+  const MAX_TOKENS_HANDLER = "return (env) => env.options ? 40 : 512";
+  const ANSWER_PARSER_BODY = "const s = TEXT.trim(); let j = null; try { j = JSON.parse(s); } catch (e) {} const a = j && j.answer ? String(j.answer) : s; return [a, a];";
+  function buildOpenAIWrapper(params) {
+    const { preset, apiKey, url, model, useJsonMode } = params;
+    return {
+      name: "AI 搜题(" + preset.label + ")",
+      homepage: preset.homepage || void 0,
+      url,
+      method: "post",
+      type: "GM_xmlhttpRequest",
+      responseType: "json",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + apiKey
+      },
+      data: {
+        model,
+        temperature: 0,
+        max_tokens: { handler: MAX_TOKENS_HANDLER },
+        ...useJsonMode ? { response_format: { type: "json_object" } } : {},
+        messages: {
+          handler: "return (env) => [{role:'system',content:'" + SYSTEM_PROMPT + "'},{role:'user',content:" + USER_CONTENT_EXPR + "}]"
+        }
+      },
+      handler: "return (res) => { " + ANSWER_PARSER_BODY.replace("TEXT", "res.choices[0].message.content") + " }",
+      aiProvider: preset.id,
+      aiModel: model
+    };
+  }
+  function buildAnthropicWrapper(params) {
+    const { preset, apiKey, url, model } = params;
+    return {
+      name: "AI 搜题(" + preset.label + ")",
+      homepage: preset.homepage || void 0,
+      url,
+      method: "post",
+      type: "GM_xmlhttpRequest",
+      responseType: "json",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      data: {
+        model,
+        temperature: 0,
+        max_tokens: { handler: MAX_TOKENS_HANDLER },
+        system: SYSTEM_PROMPT,
+        messages: {
+          handler: "return (env) => [{role:'user',content:" + USER_CONTENT_EXPR + "}]"
+        }
+      },
+      handler: "return (res) => { " + ANSWER_PARSER_BODY.replace("TEXT", "(res.content || []).map((b) => b.text || '').join('')") + " }",
+      aiProvider: preset.id,
+      aiModel: model
+    };
+  }
+  function normalizeOpenAIEndpoint(input) {
+    const url = input.trim().replace(/\/+$/, "");
+    if (!url)
+      return "";
+    if (/\/chat\/completions$/i.test(url))
+      return url;
+    if (/\/v1$/i.test(url))
+      return url + "/chat/completions";
+    return url + "/v1/chat/completions";
+  }
+  function buildAIAnswererWrapper(state2) {
+    var _a;
+    const preset = AI_PROVIDER_PRESETS.find((p) => p.id === state2.provider) || AI_PROVIDER_PRESETS[0];
+    const model = (state2.model || preset.model).trim();
+    const apiKey = state2.apiKey.trim();
+    if (preset.protocol === "anthropic") {
+      return buildAnthropicWrapper({ preset, apiKey, url: preset.url, model });
+    }
+    const url = preset.id === "custom" ? normalizeOpenAIEndpoint(state2.baseUrl || "") : preset.url;
+    const wrapper = buildOpenAIWrapper({
+      preset,
+      apiKey,
+      url,
+      model,
+      useJsonMode: preset.id !== "custom"
+    });
+    if (preset.id === "custom")
+      wrapper.aiBaseUrl = ((_a = state2.baseUrl) == null ? void 0 : _a.trim()) || "";
+    return wrapper;
+  }
+  function parseAIAnswererWrapper(wrappers) {
+    var _a, _b;
+    for (const raw of wrappers || []) {
+      const wrapper = raw;
+      if (!wrapper.aiProvider)
+        continue;
+      const headerKey = ((_a = wrapper.headers) == null ? void 0 : _a["x-api-key"]) || ((_b = wrapper.headers) == null ? void 0 : _b.Authorization) || "";
+      return {
+        provider: wrapper.aiProvider,
+        apiKey: headerKey.replace(/^Bearer\s+/i, ""),
+        baseUrl: wrapper.aiBaseUrl || (wrapper.aiProvider === "custom" ? wrapper.url : ""),
+        model: wrapper.aiModel || ""
+      };
+    }
+    return void 0;
+  }
   const EDGE_WIDTH = 100;
   const ICON_SIZE = 64;
   const SNAP_ANIMATION_MS = 250;
@@ -12996,6 +13138,163 @@ ${content}</tr>
                     ])
                   ])
                 ]);
+                const aiState = parseAIAnswererWrapper(aw);
+                const aiProviderSelect = lib.h(
+                  "select",
+                  {
+                    className: "base-style-active-form-control",
+                    style: { width: "100%", padding: "6px 8px" }
+                  },
+                  AI_PROVIDER_PRESETS.map((p) => lib.h("option", { value: p.id }, p.label))
+                );
+                const aiKeyInput = lib.h("input", {
+                  type: "password",
+                  className: "modal-input",
+                  placeholder: "粘贴 API Key",
+                  style: { flex: "1", minWidth: "200px" }
+                });
+                const aiKeyToggle = lib.h("button", "显示", (btn) => {
+                  btn.className = "modal-cancel-button";
+                  btn.style.padding = "4px 10px";
+                  btn.onclick = () => {
+                    const show = aiKeyInput.type === "password";
+                    aiKeyInput.type = show ? "text" : "password";
+                    btn.textContent = show ? "隐藏" : "显示";
+                  };
+                });
+                const aiModelInput = lib.h("input", {
+                  type: "text",
+                  className: "modal-input",
+                  placeholder: "模型名称",
+                  style: { width: "100%" }
+                });
+                const aiBaseUrlInput = lib.h("input", {
+                  type: "text",
+                  className: "modal-input",
+                  placeholder: "https://api.example.com/v1",
+                  style: { width: "100%" }
+                });
+                const aiLabel = (text2) => lib.h("div", { style: { margin: "12px 0 6px", fontSize: "13px", color: "#666" } }, text2);
+                const getAIPreset = () => AI_PROVIDER_PRESETS.find((p) => p.id === aiProviderSelect.value) || AI_PROVIDER_PRESETS[0];
+                const aiBaseUrlRow = lib.h("div", { style: { marginTop: "4px" } }, [
+                  aiLabel("接口地址（OpenAI 兼容，可填完整 URL 或 Base URL）"),
+                  aiBaseUrlInput
+                ]);
+                const syncAIProviderFields = () => {
+                  const preset = getAIPreset();
+                  aiModelInput.placeholder = preset.model;
+                  aiBaseUrlRow.style.display = preset.id === "custom" ? "" : "none";
+                };
+                aiProviderSelect.onchange = () => {
+                  aiModelInput.value = getAIPreset().model;
+                  syncAIProviderFields();
+                };
+                if (aiState) {
+                  aiProviderSelect.value = aiState.provider;
+                  aiKeyInput.value = aiState.apiKey;
+                  aiModelInput.value = aiState.model || "";
+                  aiBaseUrlInput.value = aiState.baseUrl || "";
+                }
+                if (!aiModelInput.value)
+                  aiModelInput.value = getAIPreset().model;
+                syncAIProviderFields();
+                const aiView = lib.h("div", { style: { display: "none" } }, [
+                  lib.h(
+                    "div",
+                    { className: "secondary", style: { marginBottom: "8px", lineHeight: "1.6" } },
+                    "接口地址、请求参数和解析规则均由脚本固定，只需填写 Key。保存会覆盖现有题库配置；Key 仅保存在本机脚本存储中。"
+                  ),
+                  aiLabel("供应商"),
+                  aiProviderSelect,
+                  aiLabel("API Key"),
+                  lib.h("div", { style: { display: "flex", gap: "8px", alignItems: "center" } }, [aiKeyInput, aiKeyToggle]),
+                  aiLabel("模型"),
+                  aiModelInput,
+                  aiBaseUrlRow
+                ]);
+                const saveAIConfig = async () => {
+                  const provider22 = aiProviderSelect.value;
+                  const apiKey = aiKeyInput.value.trim();
+                  const model = aiModelInput.value.trim();
+                  const baseUrl = aiBaseUrlInput.value.trim();
+                  if (!apiKey) {
+                    lib.$modal.alert({ content: "请填写 API Key。" });
+                    return;
+                  }
+                  if (provider22 === "custom" && !baseUrl) {
+                    lib.$modal.alert({ content: "请填写 OpenAI 兼容接口地址。" });
+                    return;
+                  }
+                  if (!model) {
+                    lib.$modal.alert({ content: "请填写模型名称。" });
+                    return;
+                  }
+                  const wrapper = buildAIAnswererWrapper({ provider: provider22, apiKey, baseUrl, model });
+                  await applyAws([wrapper]);
+                };
+                const aiFooter = lib.h("div", { style: { width: "100%", display: "none" } }, [
+                  lib.h("div", { className: "separator secondary" }, "AI 配置"),
+                  lib.h(
+                    "div",
+                    { style: { display: "flex", flexWrap: "wrap", justifyContent: "flex-end", marginTop: "12px" } },
+                    [
+                      lib.h("button", "清空题库配置", (btn) => {
+                        btn.className = "modal-cancel-button";
+                        enlargeFooterButton(btn);
+                        btn.style.marginRight = "auto";
+                        btn.onclick = () => clearAnswererConfig();
+                      }),
+                      lib.h("button", "关闭", (btn) => {
+                        btn.className = "modal-cancel-button";
+                        enlargeFooterButton(btn);
+                        btn.style.marginRight = "12px";
+                        btn.onclick = () => modal2 == null ? void 0 : modal2.remove();
+                      }),
+                      lib.h("button", "保存 AI 配置", (btn) => {
+                        btn.className = "modal-confirm-button";
+                        enlargeFooterButton(btn);
+                        btn.onclick = () => saveAIConfig();
+                      })
+                    ]
+                  )
+                ]);
+                const manualView = lib.h("div", [manualNotes]);
+                const manualTabBtn = lib.h("button", "手动配置", (btn) => {
+                  btn.style.cssText = "background:transparent;border:none;border-bottom:2px solid transparent;padding:8px 12px;cursor:pointer;font-size:14px;";
+                  btn.onclick = () => setAnswererTab("manual");
+                });
+                const aiTabBtn = lib.h("button", "AI 配置", (btn) => {
+                  btn.style.cssText = "background:transparent;border:none;border-bottom:2px solid transparent;padding:8px 12px;cursor:pointer;font-size:14px;";
+                  btn.onclick = () => setAnswererTab("ai");
+                });
+                const tabBar = lib.h(
+                  "div",
+                  { style: { display: "flex", gap: "4px", borderBottom: "1px solid #e5e7eb", marginBottom: "12px" } },
+                  [manualTabBtn, aiTabBtn]
+                );
+                function setAnswererTab(tab) {
+                  const isManual = tab === "manual";
+                  manualView.style.display = isManual ? "" : "none";
+                  manualFooter.style.display = isManual ? "" : "none";
+                  aiView.style.display = isManual ? "none" : "";
+                  aiFooter.style.display = isManual ? "none" : "";
+                  manualTabBtn.style.borderBottomColor = isManual ? "#1677ff" : "transparent";
+                  manualTabBtn.style.color = isManual ? "#1677ff" : "#333";
+                  manualTabBtn.style.fontWeight = isManual ? "600" : "400";
+                  aiTabBtn.style.borderBottomColor = isManual ? "transparent" : "#1677ff";
+                  aiTabBtn.style.color = isManual ? "#333" : "#1677ff";
+                  aiTabBtn.style.fontWeight = isManual ? "400" : "600";
+                }
+                const refreshAIForm = () => {
+                  const state2 = parseAIAnswererWrapper(CommonProject.scripts.settings.cfg.answererWrappers);
+                  if (!state2)
+                    return;
+                  aiProviderSelect.value = state2.provider;
+                  aiKeyInput.value = state2.apiKey;
+                  aiModelInput.value = state2.model || "";
+                  aiBaseUrlInput.value = state2.baseUrl || "";
+                  syncAIProviderFields();
+                };
                 let modalContent;
                 let modalFooter;
                 if (mode === "official" && provider2 && connectHero && connectButton && connectSteps) {
@@ -13050,8 +13349,9 @@ ${content}</tr>
                   modalContent = connectPanel;
                   modalFooter = connectFooter;
                 } else {
-                  modalContent = lib.h("div", [manualNotes, listContainer]);
-                  modalFooter = manualFooter;
+                  modalContent = lib.h("div", [tabBar, manualView, aiView, listContainer]);
+                  modalFooter = lib.h("div", { style: { width: "100%" } }, [manualFooter, aiFooter]);
+                  setAnswererTab(aiState ? "ai" : "manual");
                 }
                 const modal2 = lib.$modal.prompt({
                   width: 600,
@@ -13064,6 +13364,7 @@ ${content}</tr>
                   (_key, _value, remote) => {
                     if (remote === false) {
                       renderAnswererList();
+                      refreshAIForm();
                     }
                   }
                 );

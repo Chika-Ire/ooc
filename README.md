@@ -70,15 +70,23 @@ pnpm build
 
 其他厂商只要提供 OpenAI 兼容接口，同样可用（见第六节）。
 
-### 三、导入 AI 题库配置
+### 三、导入 AI 题库配置（图形界面）
 
 1. 打开课程页面，点击 OCS 悬浮窗。
-2. 进入 **通用 → 全局设置 → 题库配置**，切换到 **自定义**。
-3. 把下面的 JSON 完整粘贴进去，并把 `YOUR_API_KEY` 替换成你的 Key。
-4. 保存并关闭设置，刷新页面。
-5. 先在 **「搜索题目」** 面板手动输入一道题测试，确认能返回答案后再开启自动答题。
+2. 进入 **通用 → 全局设置 → 题库配置 → 自定义**。
+3. 弹窗顶部切换到 **「AI 配置」** 标签页。
+4. 选择供应商，填写 API Key：
+   - 供应商支持 **DeepSeek / OpenAI / Anthropic (Claude) / 自定义（OpenAI 兼容）**。
+   - 模型名已预填，可以修改。
+   - 选择「自定义」时，还需要填写 OpenAI 兼容的接口地址（支持 Base URL，会自动补全）。
+5. 点击 **保存 AI 配置**。注意：保存会**覆盖**当前已有的题库配置。
+6. 关闭弹窗并刷新页面，先在 **「搜索题目」** 面板手动测试一道题，确认能返回答案后再开启自动答题。
 
-### 四、配置模板
+接口地址、请求参数和响应解析规则都由脚本固定，不需要手动填写。再次打开弹窗时会自动回填已保存的供应商和 Key；切换到「手动配置」标签页可以看到生成后的完整 JSON（其中包含明文 Key，请勿分享）。
+
+### 四、手动配置（高级）
+
+如果使用列表之外的厂商，或者想直接编辑完整配置，可以切到 **「手动配置」** 标签页粘贴 JSON：
 
 ```json
 [
@@ -124,7 +132,7 @@ pnpm build
 ### 五、省 token 的设计
 
 - **只让模型输出字母**：单选回 `B`，多选回 `ABD`，判断题回 `对`/`错`，避免回显整段选项。
-- **JSON 模式**：`response_format: json_object`，输出稳定为 `{"answer":"B"}`。
+- **JSON 模式**：DeepSeek / OpenAI 使用 `response_format: json_object`，输出稳定为 `{"answer":"B"}`；自定义中转站为避免兼容问题默认不发送该参数，仍通过提示词要求 JSON。
 - **动态输出上限**：选择题 40 token，填空/简答 512 token。
 - **题目缓存**：OCS 设置中的题目缓存会按题干命中，重复题不再请求模型。
 
@@ -132,18 +140,17 @@ pnpm build
 
 ### 六、切换模型 / 厂商
 
-只要接口兼容 OpenAI Chat Completions，修改配置中的三处即可：
+图形界面已经内置四种供应商：
 
-```json
-"url": "https://你的接口地址/v1/chat/completions",
-"headers": { "Authorization": "Bearer 你的Key" },
-"data": { "model": "你的模型名" }
-```
+- **DeepSeek / OpenAI / Anthropic**：选择供应商、填 Key 即可，模型名可改。
+- **自定义（OpenAI 兼容）**：额外填写接口地址和模型名；接口地址可以只填 Base URL，脚本会自动补全 `/v1/chat/completions`，也可以直接填完整的 `.../chat/completions`。
 
-需要注意 **`@connect` 白名单**：油猴脚本只能请求脚本头部声明过的域名。本仓库已内置 `api.deepseek.com`；使用其他域名时，二选一：
+需要注意 **`@connect` 白名单**：油猴脚本只能请求脚本头部声明过的域名。目前已内置 `api.deepseek.com`、`api.openai.com`、`api.anthropic.com`。使用中转站或自建地址时，二选一：
 
 1. 修改 `scripts/build-core.js` 中的 `connect` 数组，加入新域名后重新构建；
 2. 或在 Tampermonkey 中编辑已安装脚本的元数据，手动添加 `// @connect 你的域名`（脚本更新后会被覆盖）。
+
+如果不用图形界面，也可以在“手动配置”里参照第四节的 JSON，修改 `url`、`headers` 和 `data.model`。Anthropic 的请求格式与 OpenAI 不同（`x-api-key` 头、顶层 `system`、响应在 `content[0].text`），建议直接用 AI 配置标签页生成。
 
 **图片题**：DeepSeek 的 `deepseek-chat` 不支持图片输入。题目含图时需要换成多模态模型（如 Qwen-VL、GLM-4V、gpt-4o-mini 等），并修改 `data.messages` 的 handler，把 `env.images`（base64 数组）拼成 `image_url` 内容块。OCS 已自动完成图片下载与 `[图片N]` 占位符替换。
 

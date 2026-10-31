@@ -21,6 +21,8 @@ import {
 import { IMAGE_URL_REGEX } from '../utils/answerer-env';
 import { getAnswererConfigProvider, openAnswererConnect, waitForAnswererConfig } from '../utils/answerer-connect';
 import { confirmRiskyAnswerWrappers } from '../utils/answer-wrapper-security';
+import { AI_PROVIDER_PRESETS, buildAIAnswererWrapper, parseAIAnswererWrapper } from '../utils/ai-answerer';
+import type { AIProviderId } from '../utils/ai-answerer';
 import { initEdgeMinimize } from '../utils/edge-minimize';
 import {
 	createAnswererWrapperSection,
@@ -694,6 +696,172 @@ export const CommonProject = Project.create({
 								])
 							]);
 
+							// —— AI 快捷配置（自定义题库弹窗内的「AI 配置」标签页）——
+							// 模板中的 url / method / headers / data / handler 全部固定，用户只需选择供应商、填写 Key 和模型
+							const aiState = parseAIAnswererWrapper(aw);
+							const aiProviderSelect = h(
+								'select',
+								{
+									className: 'base-style-active-form-control',
+									style: { width: '100%', padding: '6px 8px' }
+								},
+								AI_PROVIDER_PRESETS.map((p) => h('option', { value: p.id }, p.label))
+							) as HTMLSelectElement;
+							const aiKeyInput = h('input', {
+								type: 'password',
+								className: 'modal-input',
+								placeholder: '粘贴 API Key',
+								style: { flex: '1', minWidth: '200px' }
+							}) as HTMLInputElement;
+							const aiKeyToggle = h('button', '显示', (btn) => {
+								btn.className = 'modal-cancel-button';
+								btn.style.padding = '4px 10px';
+								btn.onclick = () => {
+									const show = aiKeyInput.type === 'password';
+									aiKeyInput.type = show ? 'text' : 'password';
+									btn.textContent = show ? '隐藏' : '显示';
+								};
+							});
+							const aiModelInput = h('input', {
+								type: 'text',
+								className: 'modal-input',
+								placeholder: '模型名称',
+								style: { width: '100%' }
+							}) as HTMLInputElement;
+							const aiBaseUrlInput = h('input', {
+								type: 'text',
+								className: 'modal-input',
+								placeholder: 'https://api.example.com/v1',
+								style: { width: '100%' }
+							}) as HTMLInputElement;
+							const aiLabel = (text: string) =>
+								h('div', { style: { margin: '12px 0 6px', fontSize: '13px', color: '#666' } }, text);
+							const getAIPreset = () =>
+								AI_PROVIDER_PRESETS.find((p) => p.id === aiProviderSelect.value) || AI_PROVIDER_PRESETS[0];
+							const aiBaseUrlRow = h('div', { style: { marginTop: '4px' } }, [
+								aiLabel('接口地址（OpenAI 兼容，可填完整 URL 或 Base URL）'),
+								aiBaseUrlInput
+							]);
+							const syncAIProviderFields = () => {
+								const preset = getAIPreset();
+								aiModelInput.placeholder = preset.model;
+								aiBaseUrlRow.style.display = preset.id === 'custom' ? '' : 'none';
+							};
+							aiProviderSelect.onchange = () => {
+								aiModelInput.value = getAIPreset().model;
+								syncAIProviderFields();
+							};
+							if (aiState) {
+								aiProviderSelect.value = aiState.provider;
+								aiKeyInput.value = aiState.apiKey;
+								aiModelInput.value = aiState.model || '';
+								aiBaseUrlInput.value = aiState.baseUrl || '';
+							}
+							if (!aiModelInput.value) aiModelInput.value = getAIPreset().model;
+							syncAIProviderFields();
+
+							const aiView = h('div', { style: { display: 'none' } }, [
+								h(
+									'div',
+									{ className: 'secondary', style: { marginBottom: '8px', lineHeight: '1.6' } },
+									'接口地址、请求参数和解析规则均由脚本固定，只需填写 Key。保存会覆盖现有题库配置；Key 仅保存在本机脚本存储中。'
+								),
+								aiLabel('供应商'),
+								aiProviderSelect,
+								aiLabel('API Key'),
+								h('div', { style: { display: 'flex', gap: '8px', alignItems: 'center' } }, [aiKeyInput, aiKeyToggle]),
+								aiLabel('模型'),
+								aiModelInput,
+								aiBaseUrlRow
+							]);
+
+							const saveAIConfig = async () => {
+								const provider = aiProviderSelect.value as AIProviderId;
+								const apiKey = aiKeyInput.value.trim();
+								const model = aiModelInput.value.trim();
+								const baseUrl = aiBaseUrlInput.value.trim();
+								if (!apiKey) {
+									$modal.alert({ content: '请填写 API Key。' });
+									return;
+								}
+								if (provider === 'custom' && !baseUrl) {
+									$modal.alert({ content: '请填写 OpenAI 兼容接口地址。' });
+									return;
+								}
+								if (!model) {
+									$modal.alert({ content: '请填写模型名称。' });
+									return;
+								}
+								const wrapper = buildAIAnswererWrapper({ provider, apiKey, baseUrl, model });
+								await applyAws([wrapper]);
+							};
+
+							const aiFooter = h('div', { style: { width: '100%', display: 'none' } }, [
+								h('div', { className: 'separator secondary' }, 'AI 配置'),
+								h(
+									'div',
+									{ style: { display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: '12px' } },
+									[
+										h('button', '清空题库配置', (btn) => {
+											btn.className = 'modal-cancel-button';
+											enlargeFooterButton(btn);
+											btn.style.marginRight = 'auto';
+											btn.onclick = () => clearAnswererConfig();
+										}),
+										h('button', '关闭', (btn) => {
+											btn.className = 'modal-cancel-button';
+											enlargeFooterButton(btn);
+											btn.style.marginRight = '12px';
+											btn.onclick = () => modal?.remove();
+										}),
+										h('button', '保存 AI 配置', (btn) => {
+											btn.className = 'modal-confirm-button';
+											enlargeFooterButton(btn);
+											btn.onclick = () => saveAIConfig();
+										})
+									]
+								)
+							]);
+
+							const manualView = h('div', [manualNotes]);
+							const manualTabBtn = h('button', '手动配置', (btn) => {
+								btn.style.cssText =
+									'background:transparent;border:none;border-bottom:2px solid transparent;padding:8px 12px;cursor:pointer;font-size:14px;';
+								btn.onclick = () => setAnswererTab('manual');
+							});
+							const aiTabBtn = h('button', 'AI 配置', (btn) => {
+								btn.style.cssText =
+									'background:transparent;border:none;border-bottom:2px solid transparent;padding:8px 12px;cursor:pointer;font-size:14px;';
+								btn.onclick = () => setAnswererTab('ai');
+							});
+							const tabBar = h(
+								'div',
+								{ style: { display: 'flex', gap: '4px', borderBottom: '1px solid #e5e7eb', marginBottom: '12px' } },
+								[manualTabBtn, aiTabBtn]
+							);
+							function setAnswererTab(tab: 'manual' | 'ai') {
+								const isManual = tab === 'manual';
+								manualView.style.display = isManual ? '' : 'none';
+								manualFooter.style.display = isManual ? '' : 'none';
+								aiView.style.display = isManual ? 'none' : '';
+								aiFooter.style.display = isManual ? 'none' : '';
+								manualTabBtn.style.borderBottomColor = isManual ? '#1677ff' : 'transparent';
+								manualTabBtn.style.color = isManual ? '#1677ff' : '#333';
+								manualTabBtn.style.fontWeight = isManual ? '600' : '400';
+								aiTabBtn.style.borderBottomColor = isManual ? 'transparent' : '#1677ff';
+								aiTabBtn.style.color = isManual ? '#333' : '#1677ff';
+								aiTabBtn.style.fontWeight = isManual ? '400' : '600';
+							}
+							const refreshAIForm = () => {
+								const state = parseAIAnswererWrapper(CommonProject.scripts.settings.cfg.answererWrappers);
+								if (!state) return;
+								aiProviderSelect.value = state.provider;
+								aiKeyInput.value = state.apiKey;
+								aiModelInput.value = state.model || '';
+								aiBaseUrlInput.value = state.baseUrl || '';
+								syncAIProviderFields();
+							};
+
 							/** 弹窗内容与底部：官方题库（主按钮默认）= 一键获取；自定义题库（「⋯」下拉进入）= 手动配置 */
 							let modalContent: string | HTMLElement;
 							let modalFooter: HTMLDivElement;
@@ -761,9 +929,10 @@ export const CommonProject = Project.create({
 								modalContent = connectPanel;
 								modalFooter = connectFooter;
 							} else {
-								// 自定义题库（或未配置 provider）：保持原有单页结构，已配置列表脱离 notes 独立展示
-								modalContent = h('div', [manualNotes, listContainer]);
-								modalFooter = manualFooter;
+								// 自定义题库（或未配置 provider）：顶部「手动配置 / AI 配置」标签页共用已解析题库列表
+								modalContent = h('div', [tabBar, manualView, aiView, listContainer]);
+								modalFooter = h('div', { style: { width: '100%' } }, [manualFooter, aiFooter]);
+								setAnswererTab(aiState ? 'ai' : 'manual');
 							}
 
 							const modal = $modal.prompt({
@@ -779,6 +948,7 @@ export const CommonProject = Project.create({
 								(_key, _value, remote) => {
 									if (remote === false) {
 										renderAnswererList();
+										refreshAIForm();
 									}
 								}
 							);
